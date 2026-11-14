@@ -1,0 +1,44 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, badge, stat, empty with context %}
+{% block evals %}
+<div class="card">
+  <h2>How the router picks a model</h2>
+  <ol class="small">
+    <li>Count the tokens (Claude's and Gemini's free counters, else an estimate). Haiku never gets a prompt over 100,000 tokens.</li>
+    <li>Rules decide the complexity of most jobs; a cheap tagger model decides only the unclear ones.</li>
+    <li>The routing table below gives the model for that job and complexity; without a row, the Settings choice; without that, the step's default.</li>
+    <li>If the answer fails the quick check, the next model up the ladder tries again. Busy free models fall back to their listed alternatives.</li>
+    <li>Real customer text never goes to a free model or to Gemini unless the business allows it; local-only mode uses Ollama models only.</li>
+  </ol>
+  <p class="small">Edit the table in <a href="/settings/routing">Settings, Routing</a>.</p>
+</div>
+<div class="card">
+  <h2>The routing table</h2>
+  {% if rules %}
+  <table>
+    <thead><tr><th>Job</th><th>Complexity</th><th>Model</th><th>Set by</th></tr></thead>
+    <tbody>{% for r in rules %}<tr><td>{{ r.job|replace('_', ' ') }}</td><td>{{ r.complexity }}</td><td>{{ models[r.model_key].name if r.model_key in models else r.model_key }}</td><td>{{ badge(r.source, "info") }}</td></tr>{% endfor %}</tbody>
+  </table>
+  {% else %}{{ empty("No routing rules: every job uses the Settings choice.") }}{% endif %}
+</div>
+<div class="card">
+  <h2>Router proof</h2>
+  <p class="small muted">The same chat cases twice: every answer on Claude Sonnet 5.5, then through the router. The proof is a lower cost at the same pass rate. Before a run, the price list says Sonnet costs about <strong>{{ projected.get('claude-sonnet-5-5')|money(2) }}</strong> and Haiku about <strong>{{ projected.get('claude-haiku-5-5')|money(2) }}</strong> per 100 written answers <span class="badge projected">projected</span>.</p>
+  {% if latest.always_sonnet and latest.router %}
+  <div class="grid three">
+    {{ stat("Always Sonnet", latest.always_sonnet.total_cost_usd|money, "pass rate " ~ ((latest.always_sonnet.summary.values()|list)[0].pass_rate|percent(1)) if latest.always_sonnet.summary else None, "/evals/runs/" ~ latest.always_sonnet.id) }}
+    {{ stat("Router", latest.router.total_cost_usd|money, "pass rate " ~ ((latest.router.summary.values()|list)[0].pass_rate|percent(1)) if latest.router.summary else None, "/evals/runs/" ~ latest.router.id) }}
+    {{ stat("Saved", saving|percent(1) if saving is not none else "-", "measured") }}
+  </div>
+  {% endif %}
+  {% if ctx.is_owner %}
+  <form method="post" action="/evals/special/router" class="form-actions">{{ csrf_field() }}
+    <label for="cases" style="margin:0">Cases</label><input id="cases" name="cases" type="number" min="2" max="100" value="30" style="width:90px">
+    <button class="btn" type="submit">Run the router proof</button><span class="small muted">Uses paid Claude models.</span></form>
+  {% endif %}
+  {% if proofs %}
+  <table style="margin-top:12px"><thead><tr><th>Run</th><th>Status</th><th class="num">Cost</th><th>When</th></tr></thead>
+    <tbody>{% for r in proofs %}<tr><td><a href="/evals/runs/{{ r.id }}">{{ r.name }}</a></td><td>{{ badge(r.status) }}</td><td class="num">{{ r.total_cost_usd|money }}</td><td class="small">{{ r.created_at|ago }}</td></tr>{% endfor %}</tbody></table>
+  {% endif %}
+</div>
+{% endblock %}

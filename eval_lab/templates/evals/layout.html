@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% from "macros.html" import tabs as tabs_macro %}
+{% block title %}Eval Lab{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Eval Lab</h1><span class="sub">benchmarks, runs and the release gate; every number says whether it was measured here or projected from prices</span>
+  <div class="actions">{% block actions %}{% endblock %}</div></div>
+{{ tabs_macro(tabs, tab) }}
+{% if fake_models %}<div class="notice warn small">Fake models are on, so runs here use canned replies. They check that the harness works; they are not eval results.</div>{% endif %}
+{% block evals %}{% endblock %}
+{% endblock %}

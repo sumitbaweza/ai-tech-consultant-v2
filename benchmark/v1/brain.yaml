@@ -1,0 +1,1112 @@
+# Drafted by scripts/make_benchmark.py from the v1 snapshot of the Solution Center (31 Oct 2026).
+# Every expected answer is copied from its source page; review the cases before trusting a score.
+# Never edited by the Self-Improve Loop (a protected path).
+name: 'Solution Center: Knowledge Brain'
+version: v1
+kind: brain
+cases:
+- key: KB-001
+  category: regular
+  question: How do I use Bootstrap?
+  expected: Here on Brilliant Directories we select the very best technologies for our partners. Bootstrap is a
+    Front-End Framework that adds value, user friendliness, responsive behaviour and style to your site.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000005863-how-to-use-bootstrap
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000005863-how-to-use-bootstrap
+- key: KB-002
+  category: regular
+  question: How do I send SMS Notifications To Members When They Receive a Lead?
+  expected: Overview By default, members receive an email notification when they are matched with a lead. For directories
+    that require faster response times, SMS notifications can also be sent to members using a third-party Email-to-SMS
+    service.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000040224-how-to-send-sms-notifications-to-members-when-they-receive-a-lead
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000040224-how-to-send-sms-notifications-to-members-when-they-receive-a-lead
+- key: KB-003
+  category: regular
+  question: How do I set the 404 Redirect Page as the Homepage?
+  expected: To set up a 404 redirect to the homepage in Brilliant Directories, you'll need to use the Advanced Settings.
+    Navigate to the " Settings " section.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000099697-how-to-set-the-404-redirect-page-as-the-homepage
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000099697-how-to-set-the-404-redirect-page-as-the-homepage
+- key: KB-004
+  category: regular
+  question: How do I use Zapier Triggers with the API?
+  expected: It is now possible to get database information exported through the API using Zapier Triggers. Zapier
+    triggers work by checking the database for new information periodically, approximately every 15 minutes.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000097594-how-to-use-zapier-triggers-with-the-api
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000097594-how-to-use-zapier-triggers-with-the-api
+- key: KB-005
+  category: regular
+  question: How do I post a Coupon?
+  expected: 'Access the Member Dashboard, on the left sidebar find the Coupon post type, click on it to make a new
+    post. IMPORTANT: If the Coupons option is not included in the member dashboard, the post needs to be enabled
+    for the membership plan in the post publishing tab: Finance » Membership Plans - Post Publishing Add some content
+    to the post, for example a title, description, image and more as explained below: 1.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000002341-how-to-post-a-coupon
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000002341-how-to-post-a-coupon
+- key: KB-006
+  category: regular
+  question: 'How do I update Post Data Using API: Google Sheets Example?'
+  expected: This article shows an example of how a Google Spreadsheet can be used to update post data on a site
+    using the site's API. Checklist Before Moving Forward With This Example 1) Make sure to generate a unique API
+    Key using the documentation down below as a guideline.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000101294-how-to-update-post-data-using-api-google-sheets-example
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000101294-how-to-update-post-data-using-api-google-sheets-example
+- key: KB-007
+  category: regular
+  question: How do I disable Option To Complete Member's Address Based On The Map's Marker?
+  expected: 'Member''s of the directory have the option to select and set their location based on the location of
+    the marker in the map on the Contact Details form: Use the Advanced Setting: Disable Drag-able Pins on Member
+    Google Maps System Variable: disable_drag_drop_member_map Once the Advanced Setting is enabled, the option to
+    move the pin is gone:'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000065750-how-to-disable-option-to-complete-member-s-address-based-on-the-map-s-marker
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000065750-how-to-disable-option-to-complete-member-s-address-based-on-the-map-s-marker
+- key: KB-008
+  category: regular
+  question: How do I add a Facebook Feed to Member Profile Pages?
+  expected: Business accounts can stream their Facebook feed in the sidebar of their profile. With this functionality,
+    the Facebook Feed streams all of the latest posts and updates from a specific Facebook account.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000019740-how-to-add-a-facebook-feed-to-member-profile-pages
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000019740-how-to-add-a-facebook-feed-to-member-profile-pages
+- key: KB-009
+  category: regular
+  question: What Is Additional Matching?
+  expected: Additional Matching allows directory owners to manually send a lead to additional members after the
+    lead has been submitted. This feature can be used with leads generated from both Member Contact Forms and Get
+    Matched Forms, providing greater flexibility when connecting visitors with relevant businesses or professionals.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000007993-what-is-additional-matching-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000007993-what-is-additional-matching-
+- key: KB-010
+  category: regular
+  question: How do I structure and Maximize Value Across 3 Member Tiers?
+  expected: Brilliant Directories Membership Plan Guide This guide presents a recommended structure for organizing
+    members into three key plans—Basic, Premium, and Elite—using the built-in features from the Brilliant Directories
+    platform. The goal is to maximize visibility, engagement, and upgrade incentives through clearly defined benefits
+    at each plan.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000106349-how-to-structure-and-maximize-value-across-3-member-tiers
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000106349-how-to-structure-and-maximize-value-across-3-member-tiers
+- key: KB-011
+  category: regular
+  question: How do I setup A Third Party Email Application To Access The Email Accounts?
+  expected: Automatic Connection Below is a collection of tutorials for configuring specific email applications.
+    The appropriate protocol should be selected based on the email application in use.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000003535-how-to-setup-a-third-party-email-application-to-access-the-email-accounts
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000003535-how-to-setup-a-third-party-email-application-to-access-the-email-accounts
+- key: KB-012
+  category: regular
+  question: How do I import Categories Via CSV File?
+  expected: 'To import a category structure via CSV file (useful for quickly importing large category structures),
+    please follow the steps below for creating the file. This can be used to import up to 3 levels of categories:
+    Top Level Categories, Sub Level Categories, and Sub-Sub Level Categories (for a total of three tiers ).'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000558401-how-to-import-categories-via-csv-file
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000558401-how-to-import-categories-via-csv-file
+- key: KB-013
+  category: regular
+  question: How do I submit a Support Ticket?
+  expected: Our team is always happy to help. All support is handled through email/tickets and our documentation
+    center, we strongly encourage all site owners to read up and learn as much as they can as this makes the daily
+    management of the site easiest.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000001966-how-to-submit-a-support-ticket
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000001966-how-to-submit-a-support-ticket
+- key: KB-014
+  category: regular
+  question: How do I add a Website Blog Article?
+  expected: By default, all Brilliant Directories sites come with a specific membership plan named "Admin - Blog
+    Contributor" . This plan is not searchable and is meant for the admin of the site to add specific content like
+    Digital Products and Blog Articles.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000009994-how-to-add-a-website-blog-article
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000009994-how-to-add-a-website-blog-article
+- key: KB-015
+  category: regular
+  question: How do I add Member Profile URLs in Email Templates?
+  expected: 'To add a member''s URL to an email in Brilliant Directories, follow these steps: 1. Navigate to Emails
+    » Email Templates .'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000099989-how-to-add-member-profile-urls-in-email-templates
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000099989-how-to-add-member-profile-urls-in-email-templates
+- key: KB-016
+  category: regular
+  question: How do I use and or Modify the Member Upload CV or Brochure Field (File Upload Field)?
+  expected: The Member Upload CV or Brochure field is a tool for members to upload files. The uploaded file is displayed
+    through a link on the Member's public profile.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000026216-how-to-use-and-or-modify-the-member-upload-cv-or-brochure-field-file-upload-field-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000026216-how-to-use-and-or-modify-the-member-upload-cv-or-brochure-field-file-upload-field-
+- key: KB-017
+  category: regular
+  question: How do I change Email MX Records?
+  expected: How to Change Email MX Records MX records determine where incoming email for a domain is delivered.
+    The mail provider supplies the required destination and priority values.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000034035-how-to-change-email-mx-records
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000034035-how-to-change-email-mx-records
+- key: KB-018
+  category: regular
+  question: How do I embed a Form on a Web Page?
+  expected: 'To embed any form on a web page, copy and paste the form''s shortcode. The shortcode uses the form''s
+    system name to call it, in this format: [form=System Name] For example, the Website - Contact Us form has the
+    system name contact_form , so its shortcode is: [form=contact_form] A form''s system name can be found in the
+    Form Manager (and identified on the front end using the Admin Bar).'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000059296-how-to-embed-a-form-on-a-web-page
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000059296-how-to-embed-a-form-on-a-web-page
+- key: KB-019
+  category: regular
+  question: How do I prevent and Minimize Unwanted (spam) Sign Ups to Free Membership Plans?
+  expected: Sites that offer a free sign-up option for a public listing or profile are susceptible to unwanted registrations.
+    This is a common occurrence across the internet and typically originates from SEO-focused actors attempting
+    to place backlinks to external sites across as many directories as possible.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000065513-how-to-prevent-and-minimize-unwanted-spam-sign-ups-to-free-membership-plans
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000065513-how-to-prevent-and-minimize-unwanted-spam-sign-ups-to-free-membership-plans
+- key: KB-020
+  category: regular
+  question: How do I create a Sidebar?
+  expected: A sidebar is a column of widgets shown next to the page content. Follow these steps to create a new
+    custom sidebar and add widgets to it.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000047136-how-to-create-a-sidebar
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000047136-how-to-create-a-sidebar
+- key: KB-021
+  category: regular
+  question: How do I localize the Website?
+  expected: 'The Primary Country setting is used to fall back on or recommend to users when maps/map searches are
+    needed. Primary Country Setting Go into Settings General Settings Localization: Location Search Suggestions
+    By default, whenever a user does a search by location, it will recommend suggestions from all around the world;
+    however, if the website is intended to be used in one country only, the searches should be in the intended country.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000003018-how-to-localize-the-website
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000003018-how-to-localize-the-website
+- key: KB-022
+  category: regular
+  question: How do I "DELETE" Member Posts through the API using Zapier?
+  expected: This article shows an example of how a Google Spreadsheet can be used to delete member posts using the
+    site's API. Checklist Before Moving Forward With This Example 1) Make sure to generate a unique API Key using
+    the documentation down below as a guideline.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000102226-how-to-delete-member-posts-through-the-api-using-zapier
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000102226-how-to-delete-member-posts-through-the-api-using-zapier
+- key: KB-023
+  category: regular
+  question: How do I edit the Default Search Results URL of Post Types (Events, Classifieds, Etc.)?
+  expected: To change the default URL of a post type, please follow the steps below. Go to My Content Edit Post
+    Settings.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000048798-how-to-edit-the-default-search-results-url-of-post-types-events-classifieds-etc-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000048798-how-to-edit-the-default-search-results-url-of-post-types-events-classifieds-etc-
+- key: KB-024
+  category: regular
+  question: How do I add Location Fields to Post Types Like Blog and Community Articles?
+  expected: In this article, we will be going over the steps on how to add location and map fields to post types
+    like blog and community articles. Editing the Form The first step is to navigate to Toolbox Form Manager and
+    click Customize or Edit on the preferred feature form.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000095504-how-to-add-location-fields-to-post-types-like-blog-and-community-articles
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000095504-how-to-add-location-fields-to-post-types-like-blog-and-community-articles
+- key: KB-025
+  category: regular
+  question: How do I locate Text Labels on the Front End of a Website?
+  expected: First, access the website from the admin backend in order to display the Admin Bar. Once the Admin Bar
+    is active, click on the " Show Text Labels " icon (1).
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000055818-how-to-locate-text-labels-on-the-front-end-of-a-website
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000055818-how-to-locate-text-labels-on-the-front-end-of-a-website
+- key: KB-026
+  category: regular
+  question: How do I remove the Post Publish Date?
+  expected: 'Every post is published with the Post Date visible on the website: Remove Date Sitewide The " Posted
+    " date can be removed site wide by adding this Custom CSS code in Design Settings. .posted-by-snippet-date {
+    display: none; } Add the code in the Design Settings: 1.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000101601-how-to-remove-the-post-publish-date
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000101601-how-to-remove-the-post-publish-date
+- key: KB-027
+  category: regular
+  question: How do I add Categories to H1 Search Results Title for Posts?
+  expected: 'If you wish to have your category show up in the H1 of your post search result, please follow along
+    the steps below: 1. Go to Content - Edit Post Settings and select the feature you wish to add this to.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000050248-how-to-add-categories-to-h1-search-results-title-for-posts
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000050248-how-to-add-categories-to-h1-search-results-title-for-posts
+- key: KB-028
+  category: regular
+  question: How do I migrate a Domain Connection from A Record to CNAME?
+  expected: A CNAME connection uses the site's unique directoryup.com target instead of tying a hostname to a server
+    IP. This allows the connection to follow the website when its hosting server changes.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000109346-how-to-migrate-a-domain-connection-from-a-record-to-cname
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000109346-how-to-migrate-a-domain-connection-from-a-record-to-cname
+- key: KB-029
+  category: regular
+  question: How do I "DELETE" Leads through the API using Zapier?
+  expected: This article shows an example of how a Google Spreadsheet can be used to delete a lead on a site using
+    the site's API. Checklist Before Moving Forward With This Example 1) Make sure to generate a unique API Key
+    using the documentation down below as a guideline.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000102581-how-to-delete-leads-through-the-api-using-zapier
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000102581-how-to-delete-leads-through-the-api-using-zapier
+- key: KB-030
+  category: regular
+  question: How do I post a Community Article?
+  expected: To post a community Article, access the Member Dashboard, on the left sidebar find the Community Article
+    post type. Click on it to add a new post.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000001670-how-to-post-a-community-article
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000001670-how-to-post-a-community-article
+- key: KB-031
+  category: regular
+  question: How do I edit The SEO Settings Of  Dynamic (Search Results) Pages?
+  expected: Overview Default on-page SEO is pre-configured for all pages of the site. Advanced configuration is
+    available for the SEO settings of dynamic pages, primarily search results pages and member profile pages, for
+    administrators who wish to customize them further.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000682653-how-to-edit-the-seo-settings-of-dynamic-search-results-pages
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000682653-how-to-edit-the-seo-settings-of-dynamic-search-results-pages
+- key: KB-032
+  category: regular
+  question: How do I call A Menu On A Webpage?
+  expected: In this article, you will learn how to call a menu on a webpage or within a widget. To do this, navigate
+    to Toolbox Widget Manager , then click Copy Shortcode under Actions for the desired menu.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000034726-how-to-call-a-menu-on-a-webpage
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000034726-how-to-call-a-menu-on-a-webpage
+- key: KB-033
+  category: regular
+  question: How do I get Member Subscriptions Through the API?
+  expected: In this article, we will go over how to use the Subscriptions API to retrieve subscription information
+    for a single member. How to get member subscriptions The Subscriptions API leverages a single parameter (User
+    ID or Client ID) to retrieve all the transactions data.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000107802-how-to-get-member-subscriptions-through-the-api
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000107802-how-to-get-member-subscriptions-through-the-api
+- key: KB-034
+  category: regular
+  question: How do I post a Photo Album?
+  expected: 'To post a Photo Album, access the Member Dashboard, on the left sidebar find the Photo Album post type,
+    click on it to make a new post. IMPORTANT: If the Photo Albums option is not included in the member dashboard,
+    the post needs to be enabled for the membership plan in the post publishing tab: Finance » Membership Plans
+    - Post Publishing Photo Album Form Add some content to the post, for example a title, description, category
+    and more as explained below: 1.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000002336-how-to-post-a-photo-album
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000002336-how-to-post-a-photo-album
+- key: KB-035
+  category: regular
+  question: 'How do I update Member Data Using API: Google Sheets Example?'
+  expected: This article shows an example of how a Google Spreadsheet can be used to update member data on a site
+    using the site's API. Checklist Before Moving Forward With This Example 1.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000101220-how-to-update-member-data-using-api-google-sheets-example
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000101220-how-to-update-member-data-using-api-google-sheets-example
+- key: KB-036
+  category: regular
+  question: How do I verify a Listing?
+  expected: Overview The Verified Listing feature allows administrators to manually verify member listings. Once
+    verified, a badge appears on the member's public profile, indicating to site visitors that the listing has been
+    reviewed and verified by the site administrator.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000021982-how-to-verify-a-listing
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000021982-how-to-verify-a-listing
+- key: KB-037
+  category: regular
+  question: Why is Google not indexing my Site / Pages?
+  expected: Google's Indexing Algorithm Google uses algorithms to analyze each page of a website to determine if
+    it meets its own proprietary standards for being included in its index. While tools can be used to force Google
+    to analyze a page, unfortunately there is no way to force Google to include a specific page in its index.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000087597-why-is-google-not-indexing-my-site-pages-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000087597-why-is-google-not-indexing-my-site-pages-
+- key: KB-038
+  category: regular
+  question: How do I edit the Website Email Signature?
+  expected: 'The "General" section of the General Settings can be used to add a signature for the default system
+    emails: This section will only edit the default website emails. There is also an option to add a different signature
+    for the admin operator in the admin settings: - Editing Admin Operators - FROALA Text Editor: Versions and their
+    Upload Functionalities - Froala Editor - Tables'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000052157-how-to-edit-the-website-email-signature
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000052157-how-to-edit-the-website-email-signature
+- key: KB-039
+  category: regular
+  question: How do I create a Text Box to Display Text in a Sidebar?
+  expected: 'This article describes the steps required to add a new custom text box to a sidebar. To create the
+    text box, navigate to Toolbox » Widget Manager and click the New Widget button: Name the widget, add the custom
+    code in the tab corresponding to the code language, and click Save Changes : This is a sample HTML code that
+    can be used: <div class="module" <h3 Interesting Facts: </h3 <p Both the short-term and long-term memory store
+    information in chunks, but the former is limited.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000033704-how-to-create-a-text-box-to-display-text-in-a-sidebar
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000033704-how-to-create-a-text-box-to-display-text-in-a-sidebar
+- key: KB-040
+  category: regular
+  question: How Does AdSense Work?
+  expected: 'Once the AdSense account is created, there are two types of ads that can be implemented on the website.
+    - How AdSense works Very Important Note: 1.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000686553-how-does-adsense-work-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000686553-how-does-adsense-work-
+- key: KB-041
+  category: screenshot
+  question: On the Upgrade Form » Consent checkboxes and "Upgrade My Listing" button screen, what is the "Upgrade
+    My Listing" button for?
+  expected: The screenshot shows the consent section of an upgrade form, with three required checkboxes the user
+    must tick before submitting via the green "Upgrade My Listing" button.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000044937-user-consent-tools-gdpr-compliance-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000044937-user-consent-tools-gdpr-compliance-
+- key: KB-042
+  category: screenshot
+  question: On the Photo Album » Arrange Photo Display Order screen, what is the "Back To All Photo Albums" button
+    for?
+  expected: The cover image is marked with a "Cover Image" label beneath its thumbnail, and a "Back To All Photo
+    Albums" button returns to the album list.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000002336-how-to-post-a-photo-album
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000002336-how-to-post-a-photo-album
+- key: KB-043
+  category: screenshot
+  question: On the Pricing plans » Silver plan card screen, what is the "Create Listing" button for?
+  expected: A user would pick this plan's "Create Listing" button to sign up.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000034719-side-by-side-pricing-plans-simple-style-guide-for-elements
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000034719-side-by-side-pricing-plans-simple-style-guide-for-elements
+- key: KB-044
+  category: screenshot
+  question: On the Account » Billing Details (Payment History tab) screen, what is the "Pay Now" button for?
+  expected: A red arrow points to the orange "Pay Now" button on an unpaid Featured listing invoice, which a member
+    uses to pay an invoice manually.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000069319-billing-reminder-emails-from-a-member-s-perspective
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000069319-billing-reminder-emails-from-a-member-s-perspective
+- key: KB-045
+  category: screenshot
+  question: On the Member Dashboard » Job Listings screen, what is the "Add A New Job Listing" button for?
+  expected: The Job Listings tab of the member dashboard shows no postings yet (count 0) and prompts the user to
+    click the green "Add A New Job Listing" button to publish their first job listing.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000002337-how-to-post-a-job-offer
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000002337-how-to-post-a-job-offer
+- key: KB-046
+  category: screenshot
+  question: On the Settings » Design Settings » Banner Ads » Sidebar Banner Ad screen, what is the "Use Custom Embed
+    Code" option for?
+  expected: The screenshot shows the Sidebar Banner Ad panel with an uploaded banner image, a dropdown set to 'Use
+    Custom Embed Code', and a text area containing an AdSense embed code snippet.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000019194-settings-design-settings-banner-ads
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000019194-settings-design-settings-banner-ads
+- key: KB-047
+  category: screenshot
+  question: On the Settings » Design Settings » Homepage tab » Top Hero Section » Search Box / Call to Action screen,
+    what is the "Hide Entire Hero Section" option for?
+  expected: The user chooses "Hide Entire Hero Section" from the list to hide the top hero section.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000686290-adding-a-video-above-the-fold-of-the-homepage
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000686290-adding-a-video-above-the-fold-of-the-homepage
+- key: KB-048
+  category: screenshot
+  question: On the Members list » Actions dropdown screen, what is the "Login as Member" option for?
+  expected: A red arrow points to the "Login as Member" option, which lets an admin sign in as that member.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000050864-how-to-post-images-on-wysiwyg-editors
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000050864-how-to-post-images-on-wysiwyg-editors
+- key: KB-049
+  category: screenshot
+  question: On the Manage Profile » Sub Accounts tab screen, what is the "+ New Sub Account" button for?
+  expected: A red arrow points to the blue "+ New Sub Account" button, which a user clicks to add a sub account.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000030828-multi-member-manager
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000030828-multi-member-manager
+- key: KB-050
+  category: screenshot
+  question: On the BD Documentation member dashboard » My Dashboard (sub-account view) screen, what is the "Back
+    to Parent Account" button for?
+  expected: A red arrow points to the "Back to Parent Account" button, which lets the main account holder return
+    to their parent account with one click.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000030828-multi-member-manager
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000030828-multi-member-manager
+- key: KB-051
+  category: screenshot
+  question: On the Choose a Plan to Join Today screen, what is the "Click to Join Now" button for?
+  expected: A membership plan selection page where a claiming user picks a plan; the Gold Plan card shows a "Click
+    to Join Now" button, which a user clicks to join at that tier.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000028644-claimable-business-listings
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000028644-claimable-business-listings
+- key: KB-052
+  category: screenshot
+  question: On the Settings » Select Member Information to Display on Profiles screen, what is the "Show 'Click-to-Call'
+    Button" option for?
+  expected: The red arrow points to the "Show 'Click-to-Call' Button" option, which is set to Yes, so the Click-to-Call
+    button displays for the member's phone number.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000035358-click-to-call-member-add-on
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000035358-click-to-call-member-add-on
+- key: KB-053
+  category: screenshot
+  question: On the Member profile page (John Smith) screen, what is the "Show Phone Number" button for?
+  expected: A red arrow points to the yellow "Show Phone Number" button, which is the click-to-call control a user
+    would press to reveal the member's phone number.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000035358-click-to-call-member-add-on
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000035358-click-to-call-member-add-on
+- key: KB-054
+  category: screenshot
+  question: On the Brilliant Directories Support Center » Community Forum home screen, what is the "Start a new
+    topic" link for?
+  expected: 'Callouts: Red arrow: points to the "Start a new topic" link'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000649876-what-the-brilliant-directories-support-team-can-help-with
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000649876-what-the-brilliant-directories-support-team-can-help-with
+- key: KB-055
+  category: screenshot
+  question: On the Brilliant Marketplace homepage (hero section) screen, what is the "Get Quotes Now" button for?
+  expected: A red arrow points to the orange "Get Quotes Now" button, which a user would click to request a quote
+    from an expert.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000649876-what-the-brilliant-directories-support-team-can-help-with
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000649876-what-the-brilliant-directories-support-team-can-help-with
+- key: KB-056
+  category: screenshot
+  question: On the Property Search widget (front-end) » Status dropdown open screen, what is the "Sale Pending"
+    option for?
+  expected: A red arrow points to the "Sale Pending" option, indicating it is the option highlighted for the user's
+    attention.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000063344-how-to-update-property-types-using-the-form-manager
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000063344-how-to-update-property-types-using-the-form-manager
+- key: KB-057
+  category: screenshot
+  question: On the Settings » Edit Membership Plan » Profile Page tab screen, what is the "Overview" tab for?
+  expected: A red arrow points to the Profile Page tab, and the section below lets the user choose the order of
+    items shown in the Overview tab.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000055542-member-profile-badges
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000055542-member-profile-badges
+- key: KB-058
+  category: screenshot
+  question: On the My Dashboard (member portal) screen, what is the "Posts by Saved Members" menu for?
+  expected: A red arrow points to the "Posts by Saved Members" item in the left sidebar menu, indicating where the
+    post feed setting is accessed.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000076680-personal-post-feed
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000076680-personal-post-feed
+- key: KB-059
+  category: screenshot
+  question: On the My New Website » Post Type settings » Restore Default Code section (Additional Settings collapsed)
+    screen, what is the "Restore Default Code" button for?
+  expected: The screenshot shows the bottom of a settings page where a user can restore default code for a post
+    type by selecting a post type and clicking Restore Default Code.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000067531-photo-gallery-previewer
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000067531-photo-gallery-previewer
+- key: KB-060
+  category: screenshot
+  question: On the Finance » Membership Plans screen, what is the "Sign Ups Disabled" button for?
+  expected: A red arrow points to the "Sign Ups Disabled" button on the My Claim Listing plan, which is the Claim
+    Account plan with its sign-up page turned off.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000028644-claimable-business-listings
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000028644-claimable-business-listings
+- key: KB-061
+  category: no_answer
+  question: Does Brilliant Directories integrate with Salesforce CPQ?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-062
+  category: no_answer
+  question: Can I host my directory on AWS Lambda?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-063
+  category: no_answer
+  question: How do I export my site to WordPress multisite automatically?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-064
+  category: no_answer
+  question: Is there a native iOS app builder for my members?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-065
+  category: no_answer
+  question: Can members pay with Bitcoin Lightning?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-066
+  category: no_answer
+  question: How do I connect my site to SAP Business One?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-067
+  category: no_answer
+  question: Does the platform support Kubernetes deployments?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-068
+  category: no_answer
+  question: Can I run a blockchain voting system for members?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-069
+  category: no_answer
+  question: How do I train a custom AI model inside my directory?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-070
+  category: no_answer
+  question: Is there a built-in payroll module?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-071
+  category: no_answer
+  question: Can I sync member profiles with Workday?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-072
+  category: no_answer
+  question: How do I enable 5G push notifications?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-073
+  category: no_answer
+  question: Does it include an inventory warehouse management system?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-074
+  category: no_answer
+  question: Can I send faxes to members from the admin?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-075
+  category: no_answer
+  question: How do I set up a Minecraft server for my members?
+  expected: 'The knowledge base doesn''t cover this: the agent must say it doesn''t know.'
+  sources: []
+  checks:
+    must_not_answer: true
+- key: KB-076
+  category: instructions
+  question: What are your support hours?
+  expected: Monday to Friday, 9 am to 6 pm US Eastern time.
+  sources:
+  - instruction:Support hours
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-077
+  category: instructions
+  question: Do you answer emails at the weekend?
+  expected: No live chat at weekends; weekend emails are answered on Monday.
+  sources:
+  - instruction:Support hours
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-078
+  category: instructions
+  question: Can you give me a discount on my plan?
+  expected: Never promise a discount; the Billing team replies within one business day.
+  sources:
+  - instruction:Refunds and billing disputes
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-079
+  category: instructions
+  question: Can I send you my password so you can log in for me?
+  expected: Never ask for or accept a password; give the reset steps instead.
+  sources:
+  - instruction:Passwords and account access
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-080
+  category: instructions
+  question: Can you build a custom feature for my directory? How much would it cost?
+  expected: Say honestly it isn't built in, offer a free 15-minute scoping call, never quote a price.
+  sources:
+  - instruction:Custom development requests
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-081
+  category: instructions
+  question: My domain still shows a parking page after I pointed it. What should I check?
+  expected: Check the DNS records match the setup guide, remove old A records, wait for DNS to update, then hand
+    over if it still fails.
+  sources:
+  - skill:Domain setup questions
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-082
+  category: instructions
+  question: Members say they never get the welcome email. What do I check first?
+  expected: Check the welcome email template is on and the sender address uses your own domain.
+  sources:
+  - skill:Email delivery questions
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-083
+  category: instructions
+  question: How long until billing replies about a double charge?
+  expected: The Billing team replies within one business day.
+  sources:
+  - skill:Billing, refunds and complaints
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-084
+  category: instructions
+  question: Is there live chat support on Saturday?
+  expected: There is no live chat at weekends.
+  sources:
+  - instruction:Support hours
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-085
+  category: instructions
+  question: Who should I talk to about a feature you don't have?
+  expected: A free 15-minute scoping call with the solutions team.
+  sources:
+  - instruction:Custom development requests
+  checks:
+    must_answer: true
+    knowledge_type_any:
+    - instruction
+    - skill
+- key: KB-086
+  category: synonym_typo
+  question: How do I use Bootsrtap?
+  expected: Here on Brilliant Directories we select the very best technologies for our partners. Bootstrap is a
+    Front-End Framework that adds value, user friendliness, responsive behaviour and style to your site.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000005863-how-to-use-bootstrap
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000005863-how-to-use-bootstrap
+    same_as: KB-001
+- key: KB-087
+  category: synonym_typo
+  question: How do I send SMS Noitfications To users When They Receive a Lead?
+  expected: Overview By default, members receive an email notification when they are matched with a lead. For directories
+    that require faster response times, SMS notifications can also be sent to members using a third-party Email-to-SMS
+    service.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000040224-how-to-send-sms-notifications-to-members-when-they-receive-a-lead
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000040224-how-to-send-sms-notifications-to-members-when-they-receive-a-lead
+    same_as: KB-002
+- key: KB-088
+  category: synonym_typo
+  question: How do I set the 404 Redirect Page as the Hmoepage?
+  expected: To set up a 404 redirect to the homepage in Brilliant Directories, you'll need to use the Advanced Settings.
+    Navigate to the " Settings " section.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000099697-how-to-set-the-404-redirect-page-as-the-homepage
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000099697-how-to-set-the-404-redirect-page-as-the-homepage
+    same_as: KB-003
+- key: KB-089
+  category: synonym_typo
+  question: How do I use Zapier Trgigers with the API?
+  expected: It is now possible to get database information exported through the API using Zapier Triggers. Zapier
+    triggers work by checking the database for new information periodically, approximately every 15 minutes.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000097594-how-to-use-zapier-triggers-with-the-api
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000097594-how-to-use-zapier-triggers-with-the-api
+    same_as: KB-004
+- key: KB-090
+  category: synonym_typo
+  question: How do I post a Coupon?
+  expected: 'Access the Member Dashboard, on the left sidebar find the Coupon post type, click on it to make a new
+    post. IMPORTANT: If the Coupons option is not included in the member dashboard, the post needs to be enabled
+    for the membership plan in the post publishing tab: Finance » Membership Plans - Post Publishing Add some content
+    to the post, for example a title, description, image and more as explained below: 1.'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000002341-how-to-post-a-coupon
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000002341-how-to-post-a-coupon
+    same_as: KB-005
+- key: KB-091
+  category: synonym_typo
+  question: 'How do I update Post Data Using API: Google Sheets Exampel?'
+  expected: This article shows an example of how a Google Spreadsheet can be used to update post data on a site
+    using the site's API. Checklist Before Moving Forward With This Example 1) Make sure to generate a unique API
+    Key using the documentation down below as a guideline.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000101294-how-to-update-post-data-using-api-google-sheets-example
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000101294-how-to-update-post-data-using-api-google-sheets-example
+    same_as: KB-006
+- key: KB-092
+  category: synonym_typo
+  question: How do I turn off Option To Compelte Member's Address Based On The Map's Marker?
+  expected: 'Member''s of the directory have the option to select and set their location based on the location of
+    the marker in the map on the Contact Details form: Use the Advanced Setting: Disable Drag-able Pins on Member
+    Google Maps System Variable: disable_drag_drop_member_map Once the Advanced Setting is enabled, the option to
+    move the pin is gone:'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000065750-how-to-disable-option-to-complete-member-s-address-based-on-the-map-s-marker
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000065750-how-to-disable-option-to-complete-member-s-address-based-on-the-map-s-marker
+    same_as: KB-007
+- key: KB-093
+  category: synonym_typo
+  question: How do I create a Faceobok Feed to Member Profile Pages?
+  expected: Business accounts can stream their Facebook feed in the sidebar of their profile. With this functionality,
+    the Facebook Feed streams all of the latest posts and updates from a specific Facebook account.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000019740-how-to-add-a-facebook-feed-to-member-profile-pages
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000019740-how-to-add-a-facebook-feed-to-member-profile-pages
+    same_as: KB-008
+- key: KB-094
+  category: synonym_typo
+  question: What Is Adidtional Matching?
+  expected: Additional Matching allows directory owners to manually send a lead to additional members after the
+    lead has been submitted. This feature can be used with leads generated from both Member Contact Forms and Get
+    Matched Forms, providing greater flexibility when connecting visitors with relevant businesses or professionals.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000007993-what-is-additional-matching-
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000007993-what-is-additional-matching-
+    same_as: KB-009
+- key: KB-095
+  category: synonym_typo
+  question: How do I strucutre and Maximize Value Across 3 Member Tiers?
+  expected: Brilliant Directories Membership Plan Guide This guide presents a recommended structure for organizing
+    members into three key plans—Basic, Premium, and Elite—using the built-in features from the Brilliant Directories
+    platform. The goal is to maximize visibility, engagement, and upgrade incentives through clearly defined benefits
+    at each plan.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000106349-how-to-structure-and-maximize-value-across-3-member-tiers
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000106349-how-to-structure-and-maximize-value-across-3-member-tiers
+    same_as: KB-010
+- key: KB-096
+  category: synonym_typo
+  question: How do I setup A Third Party Email Appilcation To Access The Email Accounts?
+  expected: Automatic Connection Below is a collection of tutorials for configuring specific email applications.
+    The appropriate protocol should be selected based on the email application in use.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000003535-how-to-setup-a-third-party-email-application-to-access-the-email-accounts
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000003535-how-to-setup-a-third-party-email-application-to-access-the-email-accounts
+    same_as: KB-011
+- key: KB-097
+  category: synonym_typo
+  question: How do I import Cateogries Via CSV File?
+  expected: 'To import a category structure via CSV file (useful for quickly importing large category structures),
+    please follow the steps below for creating the file. This can be used to import up to 3 levels of categories:
+    Top Level Categories, Sub Level Categories, and Sub-Sub Level Categories (for a total of three tiers ).'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/5000558401-how-to-import-categories-via-csv-file
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/5000558401-how-to-import-categories-via-csv-file
+    same_as: KB-012
+- key: KB-098
+  category: synonym_typo
+  question: How do I submit a Supprot Ticket?
+  expected: Our team is always happy to help. All support is handled through email/tickets and our documentation
+    center, we strongly encourage all site owners to read up and learn as much as they can as this makes the daily
+    management of the site easiest.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000001966-how-to-submit-a-support-ticket
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000001966-how-to-submit-a-support-ticket
+    same_as: KB-013
+- key: KB-099
+  category: synonym_typo
+  question: How do I add a site Blog Atricle?
+  expected: By default, all Brilliant Directories sites come with a specific membership plan named "Admin - Blog
+    Contributor" . This plan is not searchable and is meant for the admin of the site to add specific content like
+    Digital Products and Blog Articles.
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000009994-how-to-add-a-website-blog-article
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000009994-how-to-add-a-website-blog-article
+    same_as: KB-014
+- key: KB-100
+  category: synonym_typo
+  question: How do I create Member Profile URLs in Email Temlpates?
+  expected: 'To add a member''s URL to an email in Brilliant Directories, follow these steps: 1. Navigate to Emails
+    » Email Templates .'
+  sources:
+  - https://support.brilliantdirectories.com/support/solutions/articles/12000099989-how-to-add-member-profile-urls-in-email-templates
+  checks:
+    must_answer: true
+    cite_any:
+    - https://support.brilliantdirectories.com/support/solutions/articles/12000099989-how-to-add-member-profile-urls-in-email-templates
+    same_as: KB-015

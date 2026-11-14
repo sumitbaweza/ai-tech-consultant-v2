@@ -1,0 +1,20 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block evals %}
+<div class="card" id="runs-table" {% if busy %}hx-get="/evals/runs" hx-trigger="every 5s" hx-select="#runs-table" hx-swap="outerHTML"{% endif %}>
+  <h2>Runs</h2>
+  {% if runs %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Run</th><th>Job</th><th>Mode</th><th>Models</th><th>Status</th><th class="num">Best pass rate</th><th class="num">Cost</th><th>Started</th></tr></thead>
+    <tbody>
+    {% for r in runs %}
+      {% set rates = (r.summary or {}).values()|selectattr("pass_rate", "defined")|map(attribute="pass_rate")|reject("none")|list %}
+      <tr><td><a href="/evals/runs/{{ r.id }}">{{ r.name }}</a></td><td class="small">{{ r.job|replace('_', ' ') }}</td><td>{{ badge(r.mode, "info") }}</td>
+        <td class="small">{{ r.model_keys|join(", ") }}</td><td>{{ badge(r.status) }}</td>
+        <td class="num">{{ (rates|max)|percent if rates else "-" }}</td><td class="num">{{ r.total_cost_usd|money }}</td><td class="small">{{ r.created_at|ago }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}{{ empty("No runs yet. Start one from Benchmarks.") }}{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block evals %}
+<p class="small muted">A thumbs down in the chat proposes a test case. Accepted cases join the "Real feedback" benchmark, so the same mistake is caught next time.</p>
+{% for c in rows %}
+<div class="card">
+  <div class="row">{{ badge(c.status) }}<strong>{{ c.question }}</strong><span class="small faint">{{ c.created_at|ago }}</span></div>
+  {% if c.bad_answer %}<p class="small"><strong>The answer that got a thumbs down:</strong> {{ c.bad_answer[:600] }}</p>{% endif %}
+  {% if c.reason %}<p class="small"><strong>Why:</strong> {{ c.reason }}</p>{% endif %}
+  {% if c.status == 'new' and ctx.is_owner %}
+  <form method="post" action="/evals/feedback/{{ c.id }}/accept">{{ csrf_field() }}
+    <label for="expected-{{ c.id }}">Expected answer</label>
+    <textarea id="expected-{{ c.id }}" name="expected" rows="3">{{ c.expected }}</textarea>
+    <div class="form-actions"><button class="btn small primary" type="submit">Accept as a test case</button>
+      <button class="btn small danger" type="submit" formaction="/evals/feedback/{{ c.id }}/reject">Reject</button></div>
+  </form>
+  {% else %}
+  <p class="small"><strong>Expected:</strong> {{ c.expected }}</p>
+  {% endif %}
+</div>
+{% else %}
+<div class="card">{{ empty("No proposed cases. They appear when someone gives an answer a thumbs down in the chat.") }}</div>
+{% endfor %}
+{% endblock %}

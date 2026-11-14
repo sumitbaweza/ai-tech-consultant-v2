@@ -1,0 +1,111 @@
+# Drafted by scripts/make_benchmark.py from the v1 snapshot of the Solution Center (31 Oct 2026).
+# Every expected answer is copied from its source page; review the cases before trusting a score.
+# Never edited by the Self-Improve Loop (a protected path).
+name: 'Solution Center: teach tests'
+version: v1
+kind: teach
+cases:
+- key: TE-001
+  category: teach
+  question: Do you offer a discount for nonprofits?
+  expected: 'Yes: registered nonprofits get 20% off any yearly plan; ask Billing to apply it.'
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Yes: registered nonprofits get 20% off any yearly plan; ask
+      Billing to apply it.'
+  checks:
+    after_must_contain:
+    - 20%
+- key: TE-002
+  category: teach
+  question: Can I pay by bank transfer?
+  expected: Bank transfer is accepted for yearly plans only; invoices are sent by Billing.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Bank transfer is accepted for yearly plans only; invoices are
+      sent by Billing.'
+  checks:
+    after_must_contain:
+    - yearly
+- key: TE-003
+  category: teach
+  question: How long is the free trial?
+  expected: The free trial lasts 14 days and needs no card.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: The free trial lasts 14 days and needs no card.'
+  checks:
+    after_must_contain:
+    - 14 days
+- key: TE-004
+  category: teach
+  question: Do you migrate data from my old site?
+  expected: We migrate up to 5,000 listings for free on yearly plans.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: We migrate up to 5,000 listings for free on yearly plans.'
+  checks:
+    after_must_contain:
+    - 5,000
+- key: TE-005
+  category: teach
+  question: What is your phone support number?
+  expected: We have no phone support; email support is the only channel.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: We have no phone support; email support is the only channel.'
+  checks:
+    after_must_contain:
+    - email
+- key: TE-006
+  category: teach
+  question: Can I have two websites on one plan?
+  expected: 'No: each website needs its own plan.'
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: No: each website needs its own plan.'
+  checks:
+    after_must_contain:
+    - own plan
+- key: TE-007
+  category: teach
+  question: Do you sign NDAs before a project?
+  expected: Yes, the solutions team signs a mutual NDA before any scoping call.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Yes, the solutions team signs a mutual NDA before any scoping
+      call.'
+  checks:
+    after_must_contain:
+    - NDA
+- key: TE-008
+  category: teach
+  question: How fast do you answer support emails?
+  expected: Within one business day, usually the same day.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Within one business day, usually the same day.'
+  checks:
+    after_must_contain:
+    - one business day
+- key: TE-009
+  category: teach
+  question: Do you offer onboarding calls?
+  expected: Every new yearly customer gets one free 30-minute onboarding call.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Every new yearly customer gets one free 30-minute onboarding
+      call.'
+  checks:
+    after_must_contain:
+    - 30-minute
+- key: TE-010
+  category: teach
+  question: Can I get an invoice in another currency?
+  expected: Invoices are issued in US dollars only.
+  sources: []
+  teach:
+    correction: 'This is wrong, the right answer is: Invoices are issued in US dollars only.'
+  checks:
+    after_must_contain:
+    - US dollars

@@ -1,0 +1,34 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block evals %}
+<div class="card">
+  <form method="get" action="/evals/side" class="row">
+    <label for="case_id" style="margin:0">Case</label>
+    <select name="case_id" id="case_id" data-autosubmit style="max-width:640px">
+      <option value="">Pick a case that has answers</option>
+      {% for c in cases %}<option value="{{ c.id }}" {% if case and c.id == case.id %}selected{% endif %}>{{ c.case_key }} · {{ c.category|replace('_', ' ') }} · {{ c.question[:90] }}</option>{% endfor %}
+    </select>
+    <noscript><button class="btn small" type="submit">Show</button></noscript>
+  </form>
+</div>
+{% if case %}
+<div class="card">
+  <h2>{{ case.case_key }}: {{ case.question }}</h2>
+  <p class="small"><strong>Expected:</strong> {{ case.expected }}</p>
+  {% if case.expected_sources %}<p class="small faint">Source: {{ case.expected_sources|join(", ") }}</p>{% endif %}
+</div>
+{% if answers %}
+<div class="grid two">
+  {% for a in answers %}
+  <div class="card">
+    <div class="row"><strong>{{ models[a.model_key].name if a.model_key in models else a.model_key }}</strong>
+      {% if a.passed is none %}{{ badge("not judged", "info") }}{% elif a.passed %}{{ badge("passed") }}{% else %}{{ badge("failed") }}{% endif %}
+      <span class="small faint">{{ a.cost_usd|money }} · {{ a.latency_ms|number }} ms · <a href="/evals/runs/{{ a.run_id }}">run</a></span></div>
+    <div class="md small" style="margin-top:8px">{{ markdown(a.answer or "") }}</div>
+    {% if a.judge_score is not none %}<p class="small faint">Judge {{ "%.2f"|format(a.judge_score) }}: {{ a.judge_reason }}</p>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% else %}<div class="card">{{ empty("No answers for this case yet.") }}</div>{% endif %}
+{% endif %}
+{% endblock %}

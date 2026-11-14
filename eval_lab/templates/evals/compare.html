@@ -1,0 +1,23 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import badge, measured_or_projected %}
+{% block evals %}
+<div class="card">
+  <h2>The 14 models, step by step</h2>
+  <p class="small muted">Quality, $ for 100 runs, average and slowest-5% time, per model and step. <span class="badge measured">measured</span> rows come from a finished run in this business (the end-to-end answer runs count for "Write the answer"). <span class="badge projected">projected</span> rows are arithmetic: typical tokens per call for the step × the brief's price list. Quality is never projected: it stays empty until a run measures it.</p>
+  {% set ns = namespace(job=None) %}
+  <div class="table-wrap" style="max-height:none"><table>
+    <thead><tr><th>Model</th><th></th><th class="num">Quality</th><th class="num">$ per 100</th><th class="num">Avg ms</th><th class="num">p95 ms</th><th></th></tr></thead>
+    <tbody>
+    {% for r in rows %}
+      {% if r.job != ns.job %}{% set ns.job = r.job %}<tr><td colspan="7" style="background:var(--panel-2)"><strong>{{ r.step }}</strong> <span class="small faint">{{ r.job }}</span></td></tr>{% endif %}
+      <tr><td>{{ r.model }} {% if r.free %}{{ badge("free", "ok") }}{% endif %}{% if r.local %}{{ badge("local", "info") }}{% endif %}</td>
+        <td>{{ measured_or_projected(r.measured) }}</td>
+        <td class="num">{{ r.quality|percent(1) if r.quality is not none else "-" }}</td>
+        <td class="num">{{ r.cost_per_100|money(3) if r.cost_per_100 is not none else "-" }}</td>
+        <td class="num">{{ r.avg_ms|number }}</td><td class="num">{{ r.p95_ms|number }}</td>
+        <td class="small">{% if r.run_id %}<a href="/evals/runs/{{ r.run_id }}">run</a>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+</div>
+{% endblock %}

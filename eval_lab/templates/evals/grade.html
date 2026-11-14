@@ -1,0 +1,28 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, empty with context %}
+{% block evals %}
+<p class="small muted">You have graded {{ done }} answer(s). The judge's score stays hidden until you decide.</p>
+{% if row %}
+{% set result, case = row %}
+<div class="card">
+  <p class="small faint">{{ case.case_key }} · {{ case.category|replace('_', ' ') }}</p>
+  <h2>{{ case.question }}</h2>
+  <div class="split">
+    <div><p class="small muted">Expected answer</p><p>{{ case.expected }}</p></div>
+    <div><p class="small muted">The answer</p><div class="md">{{ markdown(result.answer or "(no answer)") }}</div></div>
+  </div>
+  <form method="post" action="/evals/grade/{{ result.id }}" style="margin-top:12px">
+    {{ csrf_field() }}
+    <label for="note">Note (optional)</label>
+    <input id="note" name="note" placeholder="Why">
+    <div class="form-actions">
+      <button class="btn primary" type="submit" name="passed" value="true">Pass</button>
+      <button class="btn danger" type="submit" name="passed" value="false">Fail</button>
+      <a class="btn" href="/evals/grade">Skip</a>
+    </div>
+  </form>
+</div>
+{% else %}
+<div class="card">{{ empty("Nothing left to grade. Run a benchmark with the judge on, then come back.") }}</div>
+{% endif %}
+{% endblock %}

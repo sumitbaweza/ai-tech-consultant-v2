@@ -1,0 +1,16 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import stat %}
+{% block evals %}
+<div class="grid four">
+  {{ stat("Answers you graded", agreement.graded|number, "blind: without the judge's score") }}
+  {{ stat("Also judged", agreement.compared|number) }}
+  {{ stat("You and the judge agree", agreement.agreed|number) }}
+  {{ stat("Agreement", agreement.rate|percent(1) if agreement.rate is not none else "-", "measured on your grades" if agreement.rate is not none else "grade 20 or more to trust it") }}
+</div>
+<div class="card" style="margin-top:16px">
+  <h2>Can the judge be trusted?</h2>
+  <p>The judge (Claude Opus 5.5 by default) scores each answer against the expected answer, from 0 to 1, with one line of reason. It never judges an answer it wrote itself: if the answer came from the judge's own model, a different model judges it.</p>
+  <p>To check the judge, grade answers yourself without seeing its score. The agreement rate above compares your verdicts with the judge's. Grade at least 20; below about 85% agreement, read the disagreements and fix the judge prompt (a new version, through the release gate).</p>
+  <a class="btn primary" href="/evals/grade">Grade answers blind</a>
+</div>
+{% endblock %}

@@ -1,0 +1,89 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, badge, stat, empty with context %}
+{% block actions %}
+{% if ctx.is_owner and failing and run.status == 'done' %}
+<form method="post" action="/improve/from-run/{{ run.id }}">{{ csrf_field() }}<button class="btn" type="submit">Send the {{ failing }} failing case(s) to Self-Improve</button></form>
+{% endif %}
+{% endblock %}
+{% block evals %}
+<div id="run-body" {% if busy %}hx-get="/evals/runs/{{ run.id }}" hx-trigger="every 5s" hx-select="#run-body" hx-swap="outerHTML"{% endif %}>
+<div class="card">
+  <div class="row"><h2 style="margin:0">{{ run.name }}</h2>{{ badge(run.status) }}{{ badge(run.mode, "info") }}{{ badge("measured") }}</div>
+  <p class="small muted" style="margin-top:6px">Job: {{ run.job|replace('_', ' ') }} · models: {{ run.model_keys|join(", ") }} · started {{ run.started_at|when }} · finished {{ run.finished_at|when }} · {{ rows|length }} results so far · total cost {{ run.total_cost_usd|money }}</p>
+  {% if run.error %}<div class="notice bad small">{{ run.error }}</div>{% endif %}
+</div>
+
+{% set per_model = [] %}
+{% for model, s in (run.summary or {}).items() if s is mapping and s.get('cases') is not none %}{% set _ = per_model.append((model, s)) %}{% endfor %}
+{% if per_model %}
+<div class="card">
+  <h2>Totals per model</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Model</th><th class="num">Cases</th><th class="num">Scored</th><th class="num">Pass rate</th><th>By category</th><th class="num">Cost</th><th class="num">$ per 100</th><th class="num">Avg ms</th><th class="num">p95 ms</th><th class="num">Errors</th></tr></thead>
+    <tbody>
+    {% for model, s in per_model %}
+      <tr><td>{{ models[model].name if model in models else model }}</td><td class="num">{{ s.cases }}</td><td class="num">{{ s.scored }}</td>
+        <td class="num"><strong>{{ s.pass_rate|percent(1) }}</strong></td>
+        <td class="small">{% for cat, rate in (s.by_category or {}).items() %}{{ cat|replace('_', ' ') }} {{ rate|percent }}{% if not loop.last %} · {% endif %}{% endfor %}
+          {% if s.hit1 is defined %}<br>top 1: {{ s.hit1|percent }} · searched {{ s.searched }}{% endif %}</td>
+        <td class="num">{{ s.cost|money }}</td><td class="num">{{ s.cost_per_100|money(3) }}</td><td class="num">{{ s.avg_ms|number }}</td><td class="num">{{ s.p95_ms|number }}</td><td class="num">{{ s.errors }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% for key, extra in (run.summary or {}).items() if extra is mapping and extra.get('cases') is none %}
+  <p class="small"><strong>{{ key|replace('_', ' ')|capitalize }}:</strong> {% for k, v in extra.items() %}{{ k|replace('_', ' ') }} {{ v }}{% if not loop.last %} · {% endif %}{% endfor %}</p>
+  {% endfor %}
+  {% if can_apply and ctx.is_owner %}
+  <form method="post" action="/evals/runs/{{ run.id }}/apply" class="form-actions">{{ csrf_field() }}
+    <button class="btn" type="submit">Use the cheapest model that passed</button>
+    <span class="small muted">The cheapest model within 2 points of the best pass rate becomes the answer model, through the release gate.</span></form>
+  {% endif %}
+</div>
+{% endif %}
+
+{% if sweep %}
+<div class="card">
+  <h2>The "I don't know" line</h2>
+  <p class="small muted">From this run's answers, what each line would have done. Below the line, the agent says "I don't know": right when the knowledge doesn't cover the question, a lost answer when it does. No new model calls. Current line: <strong>{{ current_line }}</strong>.</p>
+  <table>
+    <thead><tr><th class="num">Line</th><th class="num">Right answers</th><th class="num">Right "I don't know"</th><th class="num">Wrong answers</th><th class="num">Lost answers</th><th class="num">Wrong rate</th><th></th></tr></thead>
+    <tbody>
+    {% for s in sweep %}
+      <tr {% if current_line is not none and (s.line - current_line)|abs < 0.05 %}style="background:var(--accent-soft)"{% endif %}><td class="num">{{ s.line }}</td><td class="num">{{ s.right_answers }}</td><td class="num">{{ s.right_dont_know }}</td><td class="num">{{ s.wrong_answers }}</td><td class="num">{{ s.lost_answers }}</td><td class="num">{{ s.wrong_rate|percent(1) }}</td>
+        <td>{% if ctx.is_owner %}<form method="post" action="/evals/sweep/use">{{ csrf_field() }}<input type="hidden" name="line" value="{{ s.line }}"><input type="hidden" name="run_id" value="{{ run.id }}"><button class="btn small" type="submit">Use this line</button></form>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endif %}
+
+<div class="card">
+  <h2>Every answer</h2>
+  {% if rows %}
+  <div class="table-wrap" style="max-height:none"><table>
+    <thead><tr><th>Case</th><th>Model</th><th>Verdict</th><th>Answer</th><th>Checks and judge</th><th class="num">Cost / ms</th><th>Your note</th></tr></thead>
+    <tbody>
+    {% for result, case in rows %}
+      <tr>
+        <td class="small"><strong>{{ case.case_key }}</strong><br>{{ case.category|replace('_', ' ') }}<details><summary class="faint">question</summary>{{ case.question }}<p class="faint">Expected: {{ case.expected[:400] }}</p></details></td>
+        <td class="small">{{ models[result.model_key].name if result.model_key in models else result.model_key }}{% if result.rule_checks.get('_served_by') and result.rule_checks.get('_served_by') != result.model_key %}<br><span class="faint">served by {{ result.rule_checks.get('_served_by') }}</span>{% endif %}</td>
+        <td>{% if result.error %}{{ badge("error") }}{% elif result.passed is none %}{{ badge("not judged", "info") }}{% elif result.passed %}{{ badge("passed") }}{% else %}{{ badge("failed") }}{% endif %}</td>
+        <td class="small" style="max-width:420px">{% if result.error %}<span class="faint">{{ result.error }}</span>{% else %}<details><summary>{{ (result.answer or "")[:120] }}{% if (result.answer or "")|length > 120 %}…{% endif %}</summary><div class="md">{{ markdown(result.answer or "") }}</div>
+          {% if result.cited_sources %}<p class="faint">Cited: {{ result.cited_sources|join(", ") }}</p>{% endif %}</details>{% endif %}</td>
+        <td class="small">{% for name, ok in result.rule_checks.items() if not name.startswith('_') %}{{ badge(name|replace('_', ' '), 'ok' if ok else 'bad') }} {% endfor %}
+          {% if result.judge_score is not none %}<br>judge {{ "%.2f"|format(result.judge_score) }}: <span class="faint">{{ result.judge_reason }}</span>{% endif %}
+          {% if result.second_score is not none %}<br>second opinion {{ "%.2f"|format(result.second_score) }}{% endif %}
+          {% if result.trace_id %}<br><a href="/logs/traces/{{ result.trace_id }}">trace</a>{% endif %}</td>
+        <td class="num small">{{ result.cost_usd|money }}<br>{{ result.latency_ms|number }} ms</td>
+        <td><form hx-post="/evals/notes" hx-target="find .saved" class="stack">
+          <input type="hidden" name="case_id" value="{{ case.id }}"><input type="hidden" name="model_key" value="{{ result.model_key }}">
+          <textarea name="note" rows="2" placeholder="What was good, what was wrong" style="min-width:180px">{{ notes.get((case.id, result.model_key), "") }}</textarea>
+          <div class="row"><button class="btn small" type="submit">Save</button><span class="saved"></span></div></form></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}{{ empty("No answers yet. The run starts within a few seconds once a worker picks it up.") }}{% endif %}
+</div>
+</div>
+{% endblock %}

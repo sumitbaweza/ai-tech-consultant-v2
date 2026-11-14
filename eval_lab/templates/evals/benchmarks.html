@@ -1,0 +1,89 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block actions %}
+{% if ctx.is_owner %}
+<form method="post" action="/evals/benchmarks/load">{{ csrf_field() }}<button class="btn" type="submit">{{ "Reload" if benchmarks else "Load" }} the benchmark files</button></form>
+{% endif %}
+{% endblock %}
+{% block evals %}
+<div class="card">
+  <h2>Benchmarks</h2>
+  <p class="small muted">Loaded from the versioned files in <code>benchmark/</code>. A case keeps its key (KB-017) across versions, so scores stay comparable. The hidden set is run only by the app and is never shown to the Self-Improve agent.</p>
+  {% if benchmarks %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Name</th><th>Kind</th><th>Version</th><th class="num">Cases</th><th>By category</th><th>File</th></tr></thead>
+    <tbody>
+    {% for b in benchmarks %}
+      <tr><td>{{ b.name }}{% if b.hidden %} {{ badge("hidden", "info") }}{% endif %}</td><td>{{ b.kind }}</td><td>{{ b.version }}</td><td class="num">{{ b.case_count }}</td>
+        <td class="small">{% for cat, n in (counts.get(b.id) or {}).items() %}{{ cat|replace('_', ' ') }} {{ n }}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+        <td class="small faint">{{ b.file_path or "made in the app" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}{{ empty("No benchmark is loaded for this business yet. Load the files to start.") }}{% endif %}
+</div>
+
+{% if benchmarks and ctx.is_owner %}
+<div class="card">
+  <h2>Run a benchmark</h2>
+  <p class="small muted">Every case runs on every model you tick. Rules score what they can (hand-offs, refusals, citations); the judge reads the facts only where it must. The run saves case by case, so it carries on after an outage.</p>
+  <form method="post" action="/evals/runs">
+    {{ csrf_field() }}
+    <div class="grid two">
+      <div>
+        <label for="kind">Benchmark</label>
+        <select name="kind" id="kind">
+          {% for kind, job in kinds.items() %}<option value="{{ kind }}">{{ kind }} ({{ "the Brain's /v1/ask" if job == "brain_answer" else "the chat, end to end" }})</option>{% endfor %}
+        </select>
+        <label for="name" style="margin-top:10px">Run name</label>
+        <input id="name" name="name" placeholder="e.g. Brain v1 on the 3 Claude models">
+        <label for="limit" style="margin-top:10px">Cases (empty = all)</label>
+        <input id="limit" name="limit" type="number" min="1" max="500" placeholder="all">
+        <div style="margin-top:10px">
+          <span class="small muted">Categories (none ticked = all)</span><br>
+          {% for cat in categories %}<label class="inline small"><input type="checkbox" name="categories" value="{{ cat }}"> {{ cat|replace('_', ' ') }}</label>{% endfor %}
+        </div>
+        <div style="margin-top:10px">
+          <label class="inline"><input type="checkbox" name="second_opinion" value="true"> Second-opinion judge (free model)</label>
+          <label class="inline"><input type="checkbox" name="local_only" value="true"> Local-only (Ollama models; nothing leaves this machine)</label>
+        </div>
+      </div>
+      <div>
+        <span class="small muted">Models. The $ is <span class="badge projected">projected</span> for 100 written answers: typical tokens × the price list, not a run.</span>
+        <div class="table-wrap" style="max-height:330px;margin-top:6px"><table>
+          <tbody>
+            <tr><td><label class="inline"><input type="checkbox" name="models" value="settings" checked> The model in Settings</label></td><td class="num small faint">your choice</td></tr>
+            <tr><td><label class="inline"><input type="checkbox" name="models" value="router"> The smart router</label></td><td class="num small faint">per job</td></tr>
+            {% for key, m in models.items() %}
+            <tr><td><label class="inline"><input type="checkbox" name="models" value="{{ key }}"> {{ m.name }}</label>
+              {% if m.free %}{{ badge("free", "ok") }}{% endif %}{% if m.local %}{{ badge("local", "info") }}{% endif %}</td>
+              <td class="num small">{{ projected.get(key)|money(3) if projected.get(key) is not none else "-" }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+      </div>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Start the run</button>
+      <span class="small muted">Paid models spend credits from the keys in Settings.</span></div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Checks that cost nothing or little</h2>
+  <div class="grid two">
+    <form method="post" action="/evals/special/url-cases" class="stack">{{ csrf_field() }}
+      <div><strong>URL cases</strong> {{ badge("free", "ok") }}<div class="small muted">The 10 URL cases on the fixture website (start it with <code>docker compose --profile eval up -d fixture-site</code>): 301 moves, 404s, a nested sitemap, a duplicate and a page that comes back. No model is called.</div></div>
+      <button class="btn small" type="submit">Run the URL cases</button></form>
+    <form method="post" action="/evals/special/retrieval" class="stack">{{ csrf_field() }}
+      <div><strong>Retrieval check</strong> {{ badge("free", "ok") }}<div class="small muted">Does the right page come back in the top 5? Keywords only, meaning only and both with re-ranking, on the brain cases. Embeddings need the Voyage key; keywords need nothing.</div></div>
+      <button class="btn small" type="submit">Run the retrieval check</button></form>
+    <form method="post" action="/evals/special/teach" class="stack">{{ csrf_field() }}
+      <div><strong>Teach tests</strong><div class="small muted">Ask, correct the chat, ask again: does the corrected answer stick? 10 cases, 2 answers and 1 lesson each.</div></div>
+      <button class="btn small" type="submit">Run the teach tests</button></form>
+    <div class="stack">
+      <div><strong>Router proof and caching proof</strong><div class="small muted">Same cases twice, changing one thing. Start them from <a href="/evals/routing">Routing</a> and from Settings, Advanced.</div></div>
+    </div>
+  </div>
+</div>
+{% endif %}
+{% endblock %}

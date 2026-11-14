@@ -1,0 +1,113 @@
+# Drafted by scripts/make_benchmark.py from the v1 snapshot of the Solution Center (31 Oct 2026).
+# Every expected answer is copied from its source page; review the cases before trusting a score.
+# Never edited by the Self-Improve Loop (a protected path).
+name: 'Fixture site: URL cases'
+version: v1
+kind: url
+cases:
+- key: UR-001
+  category: url_nested
+  question: Plan the fixture sitemap index
+  expected: '3 sitemaps found: the index and its 2 nested sitemaps'
+  sources: []
+  checks:
+    day: 1
+    expect:
+      sitemap_count: 3
+- key: UR-002
+  category: url_duplicate
+  question: /articles/1 is listed in two sitemaps
+  expected: Marked as a duplicate with both sitemaps
+  sources: []
+  checks:
+    day: 1
+    expect:
+      duplicate: /articles/1
+- key: UR-003
+  category: url_nested
+  question: Read every URL once
+  expected: 8 different pages read, all Active
+  sources: []
+  checks:
+    day: 1
+    expect:
+      fetched: 8
+- key: UR-004
+  category: url_404
+  question: 'Day 2: /articles/3 answers 404'
+  expected: Watch, count 1, still in answers
+  sources: []
+  checks:
+    day: 2
+    expect:
+      page: /articles/3
+      level: watch
+      count: 1
+- key: UR-005
+  category: url_301
+  question: 'Day 2: /articles/4 moved for good'
+  expected: Old URL quarantined at once; /articles/4-new indexed and Active
+  sources: []
+  checks:
+    day: 2
+    expect:
+      page: /articles/4
+      level: quarantined
+      moved_to: /articles/4-new
+- key: UR-006
+  category: url_missing
+  question: 'Day 2: /articles/5 left the sitemap'
+  expected: Watch, count 1
+  sources: []
+  checks:
+    day: 2
+    expect:
+      page: /articles/5
+      level: watch
+      count: 1
+- key: UR-007
+  category: url_404
+  question: 'Day 3: the second miss in a row (X = 2)'
+  expected: Quarantine proposed and shown as pending; nothing done yet
+  sources: []
+  checks:
+    day: 3
+    expect:
+      pending:
+      - /articles/3
+      - /articles/5
+- key: UR-008
+  category: url_404
+  question: The owner applies the pending action
+  expected: Quarantined; never in search results
+  sources: []
+  checks:
+    day: 3
+    apply:
+    - /articles/3
+    expect:
+      page: /articles/3
+      level: quarantined
+      not_searchable: export the member list
+- key: UR-009
+  category: url_recovered
+  question: 'Day 4: /articles/3 works again'
+  expected: Count 0, Active, back in answers
+  sources: []
+  checks:
+    day: 4
+    expect:
+      page: /articles/3
+      level: active
+      count: 0
+- key: UR-010
+  category: url_recovered
+  question: 'Day 4: /articles/5 is back in the sitemap'
+  expected: Count 0, Active
+  sources: []
+  checks:
+    day: 4
+    expect:
+      page: /articles/5
+      level: active
+      count: 0

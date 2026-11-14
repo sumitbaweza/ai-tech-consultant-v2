@@ -1,0 +1,33 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import csrf_field, badge, stat, empty with context %}
+{% block evals %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">Local-only mode</h2>{{ badge("on" if business and business.local_only else "off", "ok" if business and business.local_only else "info") }}</div>
+  <p class="small muted">With local-only on, every step uses a model running on this machine through Ollama: no prompt, page or customer text leaves it, and no paid key is used. Switch it in <a href="/settings/models">Settings, Models</a>. Ollama must be running with the models below pulled.</p>
+  <table><thead><tr><th>Step</th><th>Local model</th></tr></thead>
+    <tbody>{% for s in steps %}<tr><td>{{ s.label }}</td><td>{{ s.model }}</td></tr>{% endfor %}</tbody></table>
+</div>
+<div class="card">
+  <h2>Local against normal, on the same cases</h2>
+  {% if local and normal %}
+  {% set l = (local.summary.values()|select("mapping")|list or [{}])[0] %}
+  {% set n = (normal.summary.values()|select("mapping")|list or [{}])[0] %}
+  <div class="grid two">
+    <div>
+      <p><a href="/evals/runs/{{ normal.id }}">{{ normal.name }}</a> {{ badge("measured") }}</p>
+      <div class="grid three">{{ stat("Pass rate", n.get('pass_rate')|percent(1)) }}{{ stat("$ per 100", n.get('cost_per_100')|money(3)) }}{{ stat("p95", n.get('p95_ms')|number ~ " ms") }}</div>
+    </div>
+    <div>
+      <p><a href="/evals/runs/{{ local.id }}">{{ local.name }}</a> {{ badge("measured") }}</p>
+      <div class="grid three">{{ stat("Pass rate", l.get('pass_rate')|percent(1)) }}{{ stat("$ per 100", l.get('cost_per_100')|money(3)) }}{{ stat("p95", l.get('p95_ms')|number ~ " ms") }}</div>
+    </div>
+  </div>
+  {% else %}{{ empty("Run the same benchmark once normally and once with \"Local-only\" ticked, and the two appear here side by side.") }}{% endif %}
+  {% if ctx.is_owner %}
+  <form method="post" action="/evals/runs" class="form-actions">{{ csrf_field() }}
+    <input type="hidden" name="kind" value="chat"><input type="hidden" name="models" value="settings"><input type="hidden" name="local_only" value="true">
+    <input type="hidden" name="categories" value="regular"><input type="hidden" name="limit" value="20"><input type="hidden" name="name" value="Local-only: 20 regular chat cases">
+    <button class="btn" type="submit">Run 20 chat cases local-only</button><span class="small muted">Free: Ollama on this machine.</span></form>
+  {% endif %}
+</div>
+{% endblock %}

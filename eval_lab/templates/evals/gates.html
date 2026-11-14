@@ -1,0 +1,22 @@
+{% extends "evals/layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block evals %}
+<div class="card" id="gates" {% if busy %}hx-get="/evals/gates" hx-trigger="every 5s" hx-select="#gates" hx-swap="outerHTML"{% endif %}>
+  <h2>Release gates</h2>
+  <p class="small muted">A new prompt, role, skill or model version runs on the same gate cases as the live one. It goes live only if no category's pass rate drops; otherwise it is blocked and the live version stays.</p>
+  {% if gates %}
+  <div class="table-wrap" style="max-height:none"><table>
+    <thead><tr><th>When</th><th>Change</th><th>Status</th><th>Live → new, per category</th><th>Reason</th></tr></thead>
+    <tbody>
+    {% for g in gates %}
+      <tr><td class="small">{{ g.created_at|when }}</td>
+        <td class="small"><strong>{{ g.target_kind|replace('_', ' ') }}</strong> {{ g.target_key }}<br><span class="faint">{{ g.baseline_ref or "none" }} → {{ g.candidate_ref }}</span></td>
+        <td>{{ badge(g.status) }}</td>
+        <td class="small">{% for cat, rate in g.candidate_scores.items() %}{% set before = g.baseline_scores.get(cat) %}{{ cat|replace('_', ' ') }}: {{ before|percent }} → <span style="color: var(--{{ 'bad' if before is not none and rate < before else 'ok' }})">{{ rate|percent }}</span><br>{% endfor %}</td>
+        <td class="small">{{ g.reason or "" }}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}{{ empty("No gates yet. Saving a new prompt, role, skill or model choice starts one.") }}{% endif %}
+</div>
+{% endblock %}
