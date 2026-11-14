@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block title %}Go Live{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Go live in 15 minutes</h1><span class="sub">from sign-up to a chat your team can trust, timed step by step</span>
+  <div class="actions"><span class="stopwatch" data-started="{{ setup.started_at.isoformat() }}" {% if setup.finished_at %}data-finished="1"{% endif %} title="Time since this setup started">{{ '%02d:%02d'|format(elapsed // 60, elapsed % 60) }}</span></div></div>
+<div class="vtabs">
+  <nav aria-label="Setup steps">
+    {% for s in steps %}<a href="/setup/{{ s }}" class="{{ 'active' if s == step else '' }} {{ 'done' if s in done else '' }}">{{ loop.index }}. {{ labels[s] }}{% if step_seconds.get(s) is not none %} <span class="small faint">{{ step_seconds[s] // 60 }}:{{ '%02d'|format(step_seconds[s] % 60) }}</span>{% endif %}</a>{% endfor %}
+    <form method="post" action="/setup/restart" style="margin-top:14px">{{ csrf_field() }}<button class="link-btn small" type="submit">Start the stopwatch again</button></form>
+  </nav>
+  <div>
+
+{% if step == "business" %}
+<div class="card">
+  <h2>1. Your business and its tone of voice</h2>
+  <form method="post" action="/setup/business">{{ csrf_field() }}
+    <label for="name">Business name</label><input id="name" name="name" value="{{ business.name }}" required>
+    <p style="margin-top:12px"><strong>How should answers sound?</strong></p>
+    {% for t in tones %}<label class="inline"><input type="radio" name="tone" value="{{ t }}" {% if business.tone == t %}checked{% endif %}> {{ t }}</label><br>{% endfor %}
+    <label for="tone_other" style="margin-top:8px">Or in your own words</label>
+    <input id="tone_other" name="tone_other" placeholder="e.g. friendly, never more than 5 sentences" value="{{ business.tone if business.tone not in tones else '' }}">
+    <div class="form-actions"><button class="btn primary" type="submit">Continue</button></div>
+  </form>
+</div>
+
+{% elif step == "keys" %}
+<div class="card">
+  <h2>2. Keys</h2>
+  <p class="small muted">The Claude key is required: the app runs on Claude. The others are optional (the Eval Lab compares them). Keys are encrypted and shown masked from now on.</p>
+  <table><tbody>
+  {% for kind, info, conn in keys %}
+    <tr><td style="width:190px"><strong>{{ info[0] }}</strong>{% if kind == 'claude' %} {{ badge("required", "warn") }}{% endif %}<div class="small faint">{{ info[1] }}</div></td>
+      <td>{% if conn %}<code>{{ conn.masked }}</code> {{ badge(conn.status) }}<div class="small faint">{{ conn.last_test_message or "" }}</div>{% endif %}
+        <form method="post" action="/setup/keys/{{ kind }}" class="row" style="margin-top:6px">{{ csrf_field() }}
+          <input name="value" type="{{ 'text' if kind == 'ollama' else 'password' }}" placeholder="{{ 'http://host.docker.internal:11434' if kind == 'ollama' else 'Paste the key' }}" autocomplete="off" style="max-width:340px">
+          <button class="btn small" type="submit">Save and test</button></form></td></tr>
+  {% endfor %}
+  </tbody></table>
+  <form method="post" action="/setup/keys" class="form-actions">{{ csrf_field() }}<a class="btn" href="/setup/business">Back</a><button class="btn primary" type="submit">Continue</button></form>
+</div>
+
+{% elif step == "knowledge" %}
+<div class="card">
+  <h2>3. Knowledge</h2>
+  <form method="post" action="/setup/knowledge/sitemap" class="row">{{ csrf_field() }}
+    <label for="sitemap" style="margin:0;width:110px">Sitemap URL</label><input id="sitemap" name="url" placeholder="https://support.example.com/sitemap.xml" style="max-width:420px">
+    <button class="btn small" type="submit">Plan</button></form>
+  <form method="post" action="/setup/knowledge/page" class="row" style="margin-top:8px">{{ csrf_field() }}
+    <label for="page" style="margin:0;width:110px">Page URL</label><input id="page" name="url" placeholder="https://example.com/pricing" style="max-width:420px">
+    <button class="btn small" type="submit">Add</button></form>
+  <form method="post" action="/setup/knowledge/document" enctype="multipart/form-data" class="row" style="margin-top:8px">{{ csrf_field() }}
+    <label for="file" style="margin:0;width:110px">Document</label><input id="file" name="file" type="file" accept=".pdf,.docx,.md,.txt">
+    <button class="btn small" type="submit">Upload</button></form>
+  <p class="help">The first {{ setup.starter_pages }} pages of a sitemap are read now (a few minutes), so the chat can open soon; the rest is read in the background.</p>
+</div>
+{% for s in sources %}
+<div class="card tight">
+  {% if s.kind == 'documents' %}
+  <strong>Documents</strong>: {% for d in s.documents %}{{ d.filename }}{% if not loop.last %}, {% endif %}{% endfor %}
+  {% else %}
+  {% set plan = s.plan or {} %}
+  <div class="row"><strong>{{ s.label or s.url or s.kind }}</strong>{{ badge(s.status) }}
+    {% if plan %}<span class="small faint">{{ plan.get('sitemap_count', 0) }} sitemap(s) · {{ plan.get('unique_urls', 0)|number }} pages · {{ plan.get('duplicate_count', 0) }} duplicates{% if plan.get('first_url') %} · first {{ plan.first_url }}{% endif %}</span>{% endif %}</div>
+  {% if s.progress and s.progress.total %}<div class="progress" style="margin-top:6px"><div style="width: {{ s.progress.percent }}%"></div></div><div class="small faint">{{ s.progress.done }} of {{ s.progress.total }} read{% if s.progress.minutes_left %} · about {{ s.progress.minutes_left }} min left{% endif %}</div>
+  {% elif s.kind == 'sitemap' %}
+  <form method="post" action="/setup/knowledge/start/{{ s.id }}" style="margin-top:6px">{{ csrf_field() }}<button class="btn small primary" type="submit">Start reading</button></form>
+  {% endif %}
+  {% endif %}
+</div>
+{% endfor %}
+<form method="post" action="/setup/knowledge" class="form-actions">{{ csrf_field() }}<a class="btn" href="/setup/keys">Back</a><button class="btn primary" type="submit">Continue</button></form>
+
+{% elif step == "gmail" %}
+<div class="card">
+  <h2>4. Gmail</h2>
+  <p>Connect the support mailbox: past email threads become knowledge (read-only), and the weekly report is sent from it.</p>
+  {% if gmail and gmail.status == 'ok' %}<div class="notice ok">{{ gmail.last_test_message or "Connected." }}</div>
+  {% elif google_ready %}<a class="btn" href="/connections/google/start?next=/setup/gmail">Connect Gmail</a>
+  {% else %}<div class="notice info small">Gmail sign-in needs GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env. You can skip it now and connect later in Settings, Keys.</div>{% endif %}
+  <form method="post" action="/setup/gmail" class="form-actions">{{ csrf_field() }}<a class="btn" href="/setup/knowledge">Back</a><button class="btn primary" type="submit">{{ "Continue" if gmail and gmail.status == 'ok' else "Skip for now" }}</button></form>
+</div>
+
+{% elif step == "roles" %}
+<div class="card">
+  <h2>5. Roles</h2>
+  <p class="small muted">Who will use the chat? Each role has its own instructions and answer style; change them later in Settings, Prompts and roles.</p>
+  <form method="post" action="/setup/roles">{{ csrf_field() }}
+    {% for r in roles %}<label class="inline"><input type="checkbox" name="role_ids" value="{{ r.id }}" {% if not r.archived_at %}checked{% endif %}> {{ r.name }}</label><br>{% endfor %}
+    <div class="form-actions"><a class="btn" href="/setup/gmail">Back</a><button class="btn primary" type="submit">Build</button></div>
+  </form>
+</div>
+
+{% elif step == "build" %}
+<div class="card" id="build" {% if setup.status == 'building' %}hx-get="/setup/build" hx-trigger="every 3s" hx-select="#build" hx-swap="outerHTML"{% endif %}>
+  <h2>6. Build</h2>
+  {% for s in sources if s.kind != 'documents' %}
+  <p class="small"><strong>{{ s.label or s.url }}</strong>: {{ s.progress.done or 0 }} of {{ s.progress.total or 0 }} pages read {{ badge(s.progress.status or s.status) }}</p>
+  <div class="progress"><div style="width: {{ s.progress.percent or 0 }}%"></div></div>
+  {% endfor %}
+  <ol class="small" style="margin-top:12px">
+    <li>Read the starter slice {% if setup.starter_benchmark_id %}{{ badge("done") }}{% elif setup.status == 'building' %}{{ badge("running") }}{% endif %}</li>
+    <li>Write the starting test set from your own pages {% if setup.starter_benchmark_id %}{{ badge("done") }}{% endif %}</li>
+    <li>Run it through the chat and score it {% if setup.readiness_total %}{{ badge("done") }}{% elif setup.readiness_run_id %}<a href="/evals/runs/{{ setup.readiness_run_id }}">{{ badge("running") }}</a>{% endif %}</li>
+  </ol>
+  {% if error %}<div class="notice bad small">{{ error }}</div>{% endif %}
+  {% if setup.readiness_total %}<a class="btn primary" href="/setup/readiness">See the readiness score</a>{% elif setup.status == 'building' %}<span class="small muted">This page updates by itself.</span>{% else %}<form method="post" action="/setup/build">{{ csrf_field() }}<button class="btn" type="submit">Build</button></form>{% endif %}
+</div>
+
+{% elif step == "readiness" %}
+<div class="card">
+  <h2>7. Readiness</h2>
+  {% if score is not none %}
+  <p style="font-size:22px;margin:6px 0"><strong>Answers {{ setup.readiness_correct }} of {{ setup.readiness_total }} test questions correctly</strong> ({{ score|percent }})</p>
+  <p class="small muted">{{ setup.readiness_total }} questions written from your own pages, each with its correct answer and source, answered by the chat the way your team will use it, and scored by the Eval Lab. {% if setup.readiness_run_id %}<a href="/evals/runs/{{ setup.readiness_run_id }}">See every answer</a>.{% endif %}</p>
+  <form method="post" action="/setup/readiness/threshold" class="row" style="margin-top:12px">{{ csrf_field() }}
+    <label for="level" style="margin:0">Open the chat at</label>
+    <select id="level" name="level">{% for v in (70, 75, 80, 85, 90, 95, 100) %}<option value="{{ v }}" {% if business.readiness_threshold == v %}selected{% endif %}>{{ v }}% or more</option>{% endfor %}</select>
+    <button class="btn small" type="submit">Save</button></form>
+  {% if score * 100 >= business.readiness_threshold %}
+  <form method="post" action="/setup/readiness/switch-on" class="form-actions">{{ csrf_field() }}<button class="btn primary" type="submit">Switch on the chat</button></form>
+  {% else %}
+  <div class="notice warn small" style="margin-top:12px">Below your level of {{ business.readiness_threshold }}%: the chat stays off for your team. Add knowledge (instructions, documents), fix the failing answers in the Eval Lab or with Self-Improve, then build again.</div>
+  <form method="post" action="/setup/build" class="form-actions">{{ csrf_field() }}<button class="btn" type="submit">Build again</button></form>
+  {% endif %}
+  {% else %}{{ empty("No score yet: finish the build step.") }}{% endif %}
+</div>
+{% endif %}
+  </div>
+</div>
+{% endblock %}
