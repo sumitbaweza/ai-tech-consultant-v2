@@ -1,0 +1,18 @@
+{% extends "workspace/logs_layout.html" %}
+{% from "macros.html" import csrf_field, empty with context %}
+{% block logs %}
+<div class="card">
+  <p class="muted small">Every background job retries by itself (10 tries over about 34 minutes). A job lands here only when it failed every time. Its work up to the failure is saved; Retry carries on from there.</p>
+  {% if jobs %}
+  <table>
+    <thead><tr><th>Job</th><th>Task</th><th>Queue</th><th class="num">Tries</th><th>Last scheduled</th><th></th></tr></thead>
+    <tbody>
+    {% for job in jobs %}
+      <tr><td>#{{ job.id }}</td><td>{{ job.task_name }}</td><td>{{ job.queue_name }}</td><td class="num">{{ job.attempts }}</td><td class="small">{{ job.scheduled_at|when }}</td>
+        <td class="right"><form method="post" action="/logs/failed/{{ job.id }}/retry">{{ csrf_field() }}<button class="btn small" type="submit">Retry</button></form></td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}{{ empty("No failed jobs.") }}{% endif %}
+</div>
+{% endblock %}

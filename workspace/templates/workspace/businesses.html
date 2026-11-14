@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block content %}
+<div class="page-head"><h1>Your businesses</h1></div>
+<div class="card">
+  {% if ctx.businesses %}
+  <table>
+    <thead><tr><th>Business</th><th></th></tr></thead>
+    <tbody>
+      {% for id, name in ctx.businesses %}
+      <tr>
+        <td>{{ name }} {% if id == ctx.business_id %}<span class="badge active">current</span>{% endif %}</td>
+        <td class="right">
+          <form method="post" action="/businesses/switch">{{ csrf_field() }}
+            <input type="hidden" name="business_id" value="{{ id }}">
+            <button class="btn small" type="submit">Open</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="empty">You don't belong to a business yet. Create one below.</div>
+  {% endif %}
+</div>
+<div class="card">
+  <h2>New business</h2>
+  <p class="muted">Each business has its own keys, knowledge, prompts, roles and data. Nothing is shared between businesses.</p>
+  <form method="post" action="/businesses" class="row">{{ csrf_field() }}
+    <input name="name" type="text" placeholder="Business name" required style="max-width:320px">
+    <button class="btn primary" type="submit">Create and set up</button>
+  </form>
+</div>
+{% endblock %}

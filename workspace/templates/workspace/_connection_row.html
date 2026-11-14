@@ -1,0 +1,31 @@
+{% set label, help = info %}
+<div class="card tight" id="conn-{{ kind }}">
+  <div class="row">
+    <strong style="min-width:190px">{{ label }}</strong>
+    {% if connection and connection.masked %}<code>{{ connection.masked }}</code>{% elif kind == 'ollama' %}<code>{{ default_ollama or 'http://localhost:11434' }}</code> <span class="faint small">(default)</span>{% else %}<span class="faint">not set</span>{% endif %}
+    {% if connection %}<span class="badge {{ connection.status }}">{{ connection.status }}</span>{% endif %}
+    <span class="spacer" style="flex:1"></span>
+    {% if kind != 'google' or (connection and connection.secret_enc) %}
+    <button class="btn small" hx-post="/settings/keys/{{ kind }}/test" hx-target="#conn-{{ kind }}" hx-swap="outerHTML">Test<span class="spinner"> ...</span></button>
+    {% endif %}
+  </div>
+  <div class="help">{{ help }}</div>
+  {% if error %}<div class="notice bad small">{{ error }}</div>{% endif %}
+  {% if connection and connection.last_test_message %}
+  <div class="small {{ 'muted' if connection.status == 'ok' else '' }}" style="margin-top:6px">{{ connection.last_test_message }}{% if connection.last_tested_at %} <span class="faint">· {{ connection.last_tested_at|ago }}</span>{% endif %}</div>
+  {% endif %}
+  {% if ctx.is_owner %}
+    {% if kind == 'google' %}
+    <div class="row" style="margin-top:8px">
+      {% if google_ready %}<a class="btn small primary" href="/connections/google/start">{{ 'Reconnect' if connection else 'Connect' }} Gmail</a>
+      {% else %}<span class="small muted">Set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET in .env to enable Google sign-in.</span>{% endif %}
+      {% if connection %}<form method="post" action="/settings/keys/google/delete"><input type="hidden" name="csrf_token" value="{{ csrf }}"><button class="btn small danger" type="submit">Disconnect</button></form>{% endif %}
+    </div>
+    {% else %}
+    <form class="row" style="margin-top:8px" hx-post="/settings/keys/{{ kind }}" hx-target="#conn-{{ kind }}" hx-swap="outerHTML">
+      <input name="value" type="{{ 'url' if kind == 'ollama' else 'password' }}" autocomplete="off" placeholder="{{ 'http://host.docker.internal:11434' if kind == 'ollama' else ('Replace the key' if connection else 'Paste the key') }}" style="max-width:380px" required>
+      <button class="btn small" type="submit">Save</button>
+    </form>
+    {% endif %}
+  {% endif %}
+</div>

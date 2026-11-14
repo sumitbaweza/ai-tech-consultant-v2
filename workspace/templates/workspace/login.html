@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block shell %}
+<div class="auth">
+  <div class="card">
+    <h1 style="margin-bottom:12px">Log in</h1>
+    {% if error %}<div class="notice bad">{{ error }}</div>{% endif %}
+    <form method="post" action="/login">
+      <label for="email">Email</label>
+      <input id="email" name="email" type="email" required autofocus value="{{ form.email if form else '' }}">
+      <label for="password">Password</label>
+      <input id="password" name="password" type="password" required>
+      <div class="form-actions">
+        <button class="btn primary" type="submit">Log in</button>
+        <span class="muted">New here? <a href="/signup">Sign up</a></span>
+      </div>
+    </form>
+    <hr>
+    <p class="small muted">Demo logins (made by the seed): <code>owner@demo.local</code> for the Solution Center demo,
+      <code>owner@acme.local</code> for a second business. Password: <code>demo1234</code>.</p>
+  </div>
+</div>
+{% endblock %}

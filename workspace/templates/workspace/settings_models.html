@@ -1,0 +1,33 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block settings %}
+<div class="card">
+  <h2>Model for each step</h2>
+  <p class="muted">Pick from the 14 models of the Eval Lab. A change goes through the release gate: it goes live only if no eval score drops. The router may still move an answer up one model when it fails the quick check.</p>
+  {% if local_only %}<div class="notice warn">Local-only mode is on (Advanced): every step uses the 2 local models, whatever is picked here.</div>{% endif %}
+  <form method="post" action="/settings/models">{{ csrf_field() }}
+    <table>
+      <thead><tr><th>Step</th><th>Model</th><th>Price in / out per 1M tokens</th></tr></thead>
+      <tbody>
+      {% for step in steps %}
+        <tr>
+          <td><strong>{{ step.label }}</strong><div class="faint small">{{ step.key }}</div></td>
+          <td>
+            <select name="step_{{ step.key }}" {% if not ctx.is_owner %}disabled{% endif %}>
+              <optgroup label="Compared for this step">
+              {% for key in step.recommended %}<option value="{{ key }}" {% if key == step.current %}selected{% endif %}>{{ models[key].name }}</option>{% endfor %}
+              </optgroup>
+              <optgroup label="Other models">
+              {% for key, model in models.items() if key not in step.recommended %}<option value="{{ key }}" {% if key == step.current %}selected{% endif %}>{{ model.name }}</option>{% endfor %}
+              </optgroup>
+            </select>
+          </td>
+          <td class="small muted">{% set m = models[step.current] %}{% if m.free or m.local %}free{% if m.local %} (your laptop){% endif %}{% else %}${{ m.input_price }} / ${{ m.output_price }}{% endif %}</td>
+        </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+    <div class="form-actions"><button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>Save</button></div>
+  </form>
+</div>
+{% endblock %}

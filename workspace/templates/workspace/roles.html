@@ -1,0 +1,23 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import badge %}
+{% block settings %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">Roles</h2><span style="flex:1"></span>
+    {% if ctx.is_owner %}<a class="btn primary" href="/settings/roles/new">New role</a>{% endif %}</div>
+  <p class="muted">A role decides how the agent thinks, talks and acts. The same question gets the same facts in every role, with a different depth and tone. A new role works in the chat at once, with no code change.</p>
+  <table>
+    <thead><tr><th>Role</th><th>Goal</th><th>Live</th><th>Model</th><th></th></tr></thead>
+    <tbody>
+    {% for role, live in rows %}
+      <tr>
+        <td><a href="/settings/roles/{{ role.id }}"><strong>{{ role.name }}</strong></a>{% if role.builtin %} <span class="badge info">starting role</span>{% endif %}</td>
+        <td class="small">{{ live.goal if live else '' }}</td>
+        <td>{% if live %}v{{ live.version }}{% endif %}</td>
+        <td class="small">{{ live.model_key if live and live.model_key else 'router' }}</td>
+        <td class="right"><a class="btn small" href="/settings/roles/{{ role.id }}">Edit and test</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

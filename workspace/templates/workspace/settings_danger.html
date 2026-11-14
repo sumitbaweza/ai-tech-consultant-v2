@@ -1,0 +1,16 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block settings %}
+<div class="card" style="border-color: var(--bad)">
+  <h2>Delete this business</h2>
+  {% if error %}<div class="notice bad">{{ error }}</div>{% endif %}
+  <p>This deletes <strong>{{ ctx.business_name }}</strong> for good: every page, screenshot, document, embedding, chat, lesson, eval result, report and setting, and Google's access to the connected Gmail. It cannot be undone.</p>
+  {% if ctx.is_owner %}
+  <form method="post" action="/settings/danger/delete">{{ csrf_field() }}
+    <label for="confirm_name">Type the business name to confirm</label>
+    <input id="confirm_name" name="confirm_name" type="text" autocomplete="off" required style="max-width:360px">
+    <div class="form-actions"><button class="btn danger solid" type="submit">Delete the business and all its data</button></div>
+  </form>
+  {% else %}<p class="muted">Only the owner can delete the business.</p>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block settings %}
+<div class="card">
+  <h2>Routing table</h2>
+  <p class="muted">For each job and complexity, the first model the router tries: ideally the cheapest model that passed the bar in the Eval Lab (Eval Lab &gt; Routing can fill it in). Every routing choice is logged with the call (Logs and costs &gt; Model calls).</p>
+  <form method="post" action="/settings/routing">{{ csrf_field() }}
+    <table>
+      <thead><tr><th>Job</th><th>Complexity</th><th>Model</th><th>Set by</th></tr></thead>
+      <tbody>
+        {% for rule in rules %}
+        <tr>
+          <td>{{ rule.job }}</td><td>{{ rule.complexity }}</td>
+          <td><select name="rule_{{ rule.id }}">{% for key, model in models.items() %}<option value="{{ key }}" {% if key == rule.model_key %}selected{% endif %}>{{ model.name }}</option>{% endfor %}</select></td>
+          <td>{{ badge(rule.source, 'measured' if rule.source == 'eval_lab' else 'info') }}</td>
+        </tr>
+        {% endfor %}
+        <tr>
+          <td><select name="new_job"><option value="">Add a rule...</option>{% for job in jobs %}<option>{{ job }}</option>{% endfor %}</select></td>
+          <td><select name="new_complexity"><option>low</option><option>medium</option><option>high</option></select></td>
+          <td><select name="new_model">{% for key, model in models.items() %}<option value="{{ key }}">{{ model.name }}</option>{% endfor %}</select></td>
+          <td></td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="form-actions"><button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>Save</button></div>
+  </form>
+</div>
+<div class="card small muted">
+  How the router works: 1. it counts the prompt's tokens first (Claude's and Gemini's free counters, or about 4 characters per token) and never sends more than 100,000 tokens to Haiku; 2. it tags the job by rules, or with a cheap model when unclear; 3. it picks from this table, moves up one model if the answer fails the quick check, and tries the next fallback when a free model is busy.
+</div>
+{% endblock %}

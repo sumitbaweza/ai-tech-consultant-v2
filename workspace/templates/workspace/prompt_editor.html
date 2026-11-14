@@ -1,0 +1,55 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block settings %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">{{ prompt.title }}</h2>
+    {% if live %}<span class="badge live">live v{{ live.version }}</span> {{ badge(live.author, 'info') }}{% endif %}</div>
+  <p class="muted small">{{ prompt.key }} · {{ prompt.kind|replace('_', ' ') }} · {{ prompt.description }}</p>
+  <p class="small">Variables in this text: {% for v in variables %}<code>{{ '{' ~ v ~ '}' }}</code> {% else %}none{% endfor %}
+    · must keep: {% for v in prompt.required_vars %}<code>{{ '{' ~ v ~ '}' }}</code> {% else %}none{% endfor %}
+    · write <code>{{ '{{' }}</code> and <code>{{ '}}' }}</code> for literal braces.</p>
+  <form method="post" action="/settings/prompts/{{ prompt.key }}">{{ csrf_field() }}
+    {% if missing %}
+    <div class="notice warn">This text no longer uses {% for v in missing %}<code>{{ '{' ~ v ~ '}' }}</code> {% endfor %}. The app fills it in on every call, so answers will lack it. Save anyway?
+      <input type="hidden" name="confirm" value="true"></div>
+    {% endif %}
+    <textarea class="code" name="body" spellcheck="false">{{ body }}</textarea>
+    <label for="note">What changed (optional)</label>
+    <input id="note" name="note" type="text" value="{{ note or '' }}">
+    <div class="form-actions">
+      <button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>{{ 'Save anyway' if missing else 'Save as a new version' }}</button>
+      <a class="btn" href="/settings/prompts/{{ prompt.key }}">Cancel</a>
+    </div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Versions</h2>
+  <table>
+    <thead><tr><th>Version</th><th>Status</th><th>Author</th><th>When</th><th>Note</th><th></th></tr></thead>
+    <tbody>
+    {% for v in versions %}
+      <tr>
+        <td>v{{ v.version }}</td><td>{{ badge(v.status) }}</td><td>{{ badge(v.author, 'info') }}</td>
+        <td class="small">{{ v.created_at|when }}</td><td class="small">{{ v.note or '' }}</td>
+        <td class="right row" style="justify-content:flex-end">
+          {% if live and v.id != live.id %}
+          <button class="btn small" hx-get="/settings/prompts/{{ prompt.key }}/diff?a={{ v.id }}&b={{ live.id }}" hx-target="#diff">Diff with live</button>
+          {% endif %}
+          {% if ctx.is_owner and (not live or v.id != live.id) %}
+          <form method="post" action="/settings/prompts/{{ prompt.key }}/restore">{{ csrf_field() }}
+            <input type="hidden" name="source" value="{{ v.id }}"><button class="btn small" type="submit">Restore</button></form>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  <div class="row" style="margin-top:10px">
+    {% if live %}<button class="btn small" hx-get="/settings/prompts/{{ prompt.key }}/diff?a={{ live.id }}&b=default" hx-target="#diff">Diff live with the default</button>{% endif %}
+    {% if ctx.is_owner %}<form method="post" action="/settings/prompts/{{ prompt.key }}/restore">{{ csrf_field() }}
+      <input type="hidden" name="source" value="default"><button class="btn small" type="submit">Restore the default</button></form>{% endif %}
+  </div>
+  <div id="diff" style="margin-top:12px"></div>
+</div>
+{% endblock %}

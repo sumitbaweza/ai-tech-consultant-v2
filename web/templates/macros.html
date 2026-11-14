@@ -1,0 +1,39 @@
+{# Shared pieces for every screen #}
+
+{% macro tabs(items, current) %}
+<nav class="tabs" aria-label="Page tabs">
+  {% for label, href, key in items %}
+  <a href="{{ href }}" class="{{ 'active' if key == current else '' }}">{{ label }}</a>
+  {% endfor %}
+</nav>
+{% endmacro %}
+
+{% macro vtabs_nav(items, current) %}
+<nav aria-label="Section tabs">
+  {% for label, href, key in items %}
+  <a href="{{ href }}" class="{{ 'active' if key == current else '' }}">{{ label }}</a>
+  {% endfor %}
+</nav>
+{% endmacro %}
+
+{% macro badge(value, kind=None) %}<span class="badge {{ kind or value }}">{{ value|replace('_', ' ') }}</span>{% endmacro %}
+
+{% macro csrf_field() %}<input type="hidden" name="csrf_token" value="{{ csrf }}">{% endmacro %}
+
+{% macro stat(label, value, note=None, href=None) %}
+<div class="stat">
+  <div class="label">{{ label }}</div>
+  <div class="value">{% if href %}<a href="{{ href }}">{{ value }}</a>{% else %}{{ value }}{% endif %}</div>
+  {% if note %}<div class="note">{{ note }}</div>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro empty(text) %}<div class="empty">{{ text }}</div>{% endmacro %}
+
+{% macro diff_view(text) %}
+<div class="diff">{% for line in text.splitlines() %}{% if line.startswith('+') and not line.startswith('+++') %}<span class="add">{{ line }}</span>{% elif line.startswith('-') and not line.startswith('---') %}<span class="del">{{ line }}</span>{% else %}<span class="ctx">{{ line }}</span>{% endif %}{% endfor %}</div>
+{% endmacro %}
+
+{% macro measured_or_projected(is_measured) %}
+{% if is_measured %}<span class="badge measured">measured</span>{% else %}<span class="badge projected" title="Arithmetic from token counts and prices, not a model run">projected</span>{% endif %}
+{% endmacro %}

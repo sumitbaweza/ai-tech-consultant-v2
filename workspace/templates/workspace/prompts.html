@@ -1,0 +1,25 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import badge %}
+{% block settings %}
+<div class="card">
+  <h2>Prompts</h2>
+  <p class="muted">Every prompt the app sends to a model, starting with our best default. Change any of them; every save is a new version, checked by the release gate before it goes live. The app builds each answer's full prompt from these, the role and the right skill, so nobody has to write prompts by hand.</p>
+  <table>
+    <thead><tr><th>Prompt</th><th>Kind</th><th>Live version</th><th>Variables</th><th></th></tr></thead>
+    <tbody>
+    {% for prompt, live in rows %}
+      <tr>
+        <td><a href="/settings/prompts/{{ prompt.key }}"><strong>{{ prompt.title }}</strong></a>
+          <div class="small faint">{{ prompt.key }}{% if prompt.advanced %} · advanced{% endif %}</div>
+          <div class="small muted">{{ prompt.description }}</div></td>
+        <td class="small">{{ prompt.kind|replace('_', ' ') }}</td>
+        <td>{% if live %}v{{ live.version }} {{ badge(live.author, 'info') }}{% endif %}
+          {% if pending.get(prompt.id) %}<div>{{ badge('gating') }}</div>{% endif %}</td>
+        <td class="small">{% for v in prompt.required_vars %}<code>{{ '{' ~ v ~ '}' }}</code> {% endfor %}</td>
+        <td class="right"><a class="btn small" href="/settings/prompts/{{ prompt.key }}">Edit</a></td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

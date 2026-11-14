@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+{% from "macros.html" import vtabs_nav %}
+{% block content %}
+<div class="page-head"><h1>Settings</h1><span class="sub">{{ ctx.business_name }}</span></div>
+<div class="vtabs">
+  {{ vtabs_nav(tabs, tab) }}
+  <section>{% block settings %}{% endblock %}</section>
+</div>
+{% endblock %}

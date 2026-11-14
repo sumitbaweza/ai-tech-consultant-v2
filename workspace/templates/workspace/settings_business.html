@@ -1,0 +1,32 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block settings %}
+<div class="card">
+  <h2>Business</h2>
+  <form method="post" action="/settings/business">{{ csrf_field() }}
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" value="{{ business.name }}" required>
+    <label for="tone">Tone of voice</label>
+    <input id="tone" name="tone" type="text" value="{{ business.tone }}">
+    <div class="help">Every role writes in this tone, on top of its own. Example: "friendly, clear and short".</div>
+    <div class="grid two">
+      <div>
+        <label for="readiness_threshold">Readiness level to switch the chat on (%)</label>
+        <input id="readiness_threshold" name="readiness_threshold" type="number" min="0" max="100" value="{{ business.readiness_threshold }}">
+        <div class="help">Go Live opens the chat to your team only when the readiness score reaches this.</div>
+      </div>
+      <div>
+        <label for="dont_know_threshold">"I don't know" line (search score, 0 to 1)</label>
+        <input id="dont_know_threshold" name="dont_know_threshold" type="number" step="0.01" min="0" max="1" value="{{ business.dont_know_threshold }}">
+        <div class="help">Below this, the agent says it doesn't know instead of guessing. The Eval Lab's threshold sweep shows the trade-off and sets it.</div>
+      </div>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>Save</button>
+      {% if not ctx.is_owner %}<span class="muted">Only the owner can change settings.</span>{% endif %}</div>
+  </form>
+</div>
+<div class="card">
+  <h3>Chat status</h3>
+  <p>{% if business.chat_enabled %}<span class="badge ok">on</span> The chat is open to your team.{% else %}<span class="badge warn">off</span> The chat opens when the readiness score reaches {{ business.readiness_threshold }}% (<a href="/setup">Go Live</a>).{% endif %}</p>
+</div>
+{% endblock %}

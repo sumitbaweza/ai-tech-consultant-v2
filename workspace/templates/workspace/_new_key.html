@@ -1,0 +1,6 @@
+<div class="notice warn" style="margin-top:12px">
+  <strong>Copy this key now: it won't be shown again.</strong>
+  <pre id="new-key-value">{{ key }}</pre>
+  <button class="btn small" data-copy="#new-key-value" type="button">Copy</button>
+  <p class="small" style="margin-top:8px">Use it as <code>Authorization: Bearer {{ key[:10] }}...</code>. Reload the page to see it in the list.</p>
+</div>

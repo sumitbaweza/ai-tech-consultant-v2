@@ -1,0 +1,55 @@
+{% extends "workspace/logs_layout.html" %}
+{% from "macros.html" import stat, empty %}
+{% block logs %}
+<div class="grid four">
+  {{ stat("Last 24 hours", totals.day|money) }}
+  {{ stat("Last 7 days", totals.week|money, totals.calls_week|number ~ " calls") }}
+  {{ stat("Last 30 days", totals.month|money) }}
+  {{ stat("Cached tokens, 7 days", totals.cached_week|number, "read from Claude's cache at a fraction of the price") }}
+</div>
+{% if costliest %}
+<div class="card" style="margin-top:16px">
+  <h2>Costliest step</h2>
+  <p><strong>{{ costliest.step }}</strong> ({{ costliest.job }}): {{ costliest.per_100|money(2) }} for 100 runs, {{ costliest.avg_ms }} ms on average, {{ costliest.p95_ms }} ms for the slowest 5%.</p>
+</div>
+{% endif %}
+<div class="card">
+  <h2>Cost per day, last 14 days</h2>
+  {% if by_day %}
+  <table>
+    <tbody>
+    {% for d in by_day %}
+      <tr><td style="width:110px">{{ d.day }}</td>
+        <td><div class="progress"><div style="width: {{ (d.cost|float / max_day * 100)|round(1) }}%"></div></div></td>
+        <td class="num" style="width:110px">{{ d.cost|money }}</td><td class="num small faint" style="width:90px">{{ d.calls }} calls</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}{{ empty("No model calls yet.") }}{% endif %}
+</div>
+<div class="card">
+  <h2>By step</h2>
+  {% if by_step %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Step</th><th>Job</th><th class="num">Calls</th><th class="num">Total</th><th class="num">$ per 100 runs</th><th class="num">Avg ms</th><th class="num">p95 ms</th></tr></thead>
+    <tbody>{% for s in by_step %}<tr><td>{{ s.step }}</td><td>{{ s.job }}</td><td class="num">{{ s.calls }}</td><td class="num">{{ s.cost|money }}</td><td class="num">{{ s.per_100|money(3) }}</td><td class="num">{{ s.avg_ms }}</td><td class="num">{{ s.p95_ms }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No model calls yet.") }}{% endif %}
+</div>
+<div class="grid two">
+  <div class="card">
+    <h2>By model</h2>
+    {% if by_model %}
+    <table><thead><tr><th>Model</th><th class="num">Calls</th><th class="num">Tokens in / out</th><th class="num">Cost</th><th class="num">p95 ms</th></tr></thead>
+    <tbody>{% for m in by_model %}<tr><td>{{ m.model_key }}{% if m.errors %} <span class="badge error">{{ m.errors }} errors</span>{% endif %}</td><td class="num">{{ m.calls }}</td><td class="num small">{{ m.input_tokens|number }} / {{ m.output_tokens|number }}</td><td class="num">{{ m.cost|money }}</td><td class="num">{{ m.p95_ms }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("Nothing yet.") }}{% endif %}
+  </div>
+  <div class="card">
+    <h2>By role</h2>
+    {% if by_role %}
+    <table><thead><tr><th>Role</th><th class="num">Calls</th><th class="num">Cost</th></tr></thead>
+    <tbody>{% for r in by_role %}<tr><td>{{ r.role }}</td><td class="num">{{ r.calls }}</td><td class="num">{{ r.cost|money }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("Nothing yet.") }}{% endif %}
+  </div>
+</div>
+{% endblock %}

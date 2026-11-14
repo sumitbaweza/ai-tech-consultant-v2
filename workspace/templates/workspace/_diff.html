@@ -1,0 +1,2 @@
+{% from "macros.html" import diff_view %}
+{% if text %}{{ diff_view(text) }}{% else %}<div class="notice info">No difference.</div>{% endif %}

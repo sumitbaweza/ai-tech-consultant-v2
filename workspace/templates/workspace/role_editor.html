@@ -1,0 +1,60 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block settings %}
+<form id="role-form" method="post" action="{{ '/settings/roles/' ~ role.id if role else '/settings/roles' }}">{{ csrf_field() }}
+<div class="split">
+  <div class="card">
+    <div class="row"><h2 style="margin:0">{{ role.name if role else 'New role' }}</h2>
+      {% if role %}<span class="badge live">live v{{ version.version }}</span>{% endif %}</div>
+    <label for="name">Name</label>
+    <input id="name" name="name" type="text" value="{{ role.name if role else version.name }}" required>
+    <label for="goal">Goal</label>
+    <input id="goal" name="goal" type="text" value="{{ version.goal }}" required>
+    <label for="prompt">Prompt</label>
+    <textarea id="prompt" name="prompt" class="code" style="min-height:220px" required>{{ version.prompt }}</textarea>
+    <label for="tone">Tone</label>
+    <input id="tone" name="tone" type="text" value="{{ version.tone }}">
+    <label>What it may do</label>
+    {% for key, label in capabilities.items() %}
+      <label class="inline"><input type="checkbox" name="cap_{{ key }}" value="1" {% if key in version.capabilities %}checked{% endif %}> {{ label }}</label>
+    {% endfor %}
+    <label>Knowledge it may use</label>
+    {% for kt in knowledge_types %}
+      <label class="inline"><input type="checkbox" name="kt_{{ kt }}" value="1" {% if kt in version.knowledge_types %}checked{% endif %}> {{ kt|replace('_', ' ') }}</label>
+    {% endfor %}
+    <label for="skill_keys">Skills it may use (keys, comma separated; empty = all)</label>
+    <input id="skill_keys" name="skill_keys" type="text" value="{{ version.skill_keys|join(', ') }}">
+    <label for="model_key">Model</label>
+    <select id="model_key" name="model_key">
+      <option value="">The router picks (recommended)</option>
+      {% for key, model in models.items() %}<option value="{{ key }}" {% if key == version.model_key %}selected{% endif %}>{{ model.name }}</option>{% endfor %}
+    </select>
+    <label for="handover_note">When to hand over to a human</label>
+    <input id="handover_note" name="handover_note" type="text" value="{{ version.handover.get('note', '') }}">
+    <div class="help">Angry, refund and legal messages always go to a human, whatever this says.</div>
+    <div class="form-actions">
+      <button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>{{ 'Save as a new version' if role else 'Create role' }}</button>
+      {% if role and not role.builtin and ctx.is_owner %}
+      <button class="btn danger" type="submit" formaction="/settings/roles/{{ role.id }}/archive">Archive</button>
+      {% endif %}
+    </div>
+  </div>
+  <div class="card">
+    <h2>Test this role</h2>
+    <p class="muted small">Answers with the settings on the left, saved or not. Type a question or paste a customer's email.</p>
+    <textarea name="question" placeholder="How do I connect my own domain?" style="min-height:90px"></textarea>
+    <div class="form-actions">
+      <button class="btn" type="button" hx-post="/settings/role-test" hx-include="#role-form" hx-target="#role-test-result">Ask<span class="spinner"> ...</span></button>
+    </div>
+    <div id="role-test-result" style="margin-top:12px"></div>
+  </div>
+</div>
+</form>
+{% if versions %}
+<div class="card">
+  <h2>Versions</h2>
+  <table><thead><tr><th>Version</th><th>Status</th><th>When</th><th>Tone</th></tr></thead>
+  <tbody>{% for v in versions %}<tr><td>v{{ v.version }}</td><td>{{ badge(v.status) }}</td><td class="small">{{ v.created_at|when }}</td><td class="small">{{ v.tone }}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endif %}
+{% endblock %}

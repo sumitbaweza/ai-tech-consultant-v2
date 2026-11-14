@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% from "macros.html" import stat, badge %}
+{% block content %}
+<div class="page-head"><h1>Dashboard</h1><span class="sub">{{ ctx.business_name }}</span>
+  <div class="actions"><a class="btn primary" href="/chat">Open the chat</a></div></div>
+
+{% if not business.chat_enabled %}
+<div class="notice warn">The chat is not switched on for your team yet. <a href="/setup">Finish Go Live</a>: it opens when the readiness score reaches {{ business.readiness_threshold }}%.</div>
+{% endif %}
+{% if brain_error %}<div class="notice bad">The Knowledge Brain isn't answering: {{ brain_error }}</div>{% endif %}
+
+<div class="grid four">
+  {% if setup and setup.readiness_total %}
+    {{ stat("Readiness", setup.readiness_correct ~ " of " ~ setup.readiness_total, "starter test questions answered correctly", "/setup") }}
+  {% else %}
+    {{ stat("Readiness", "not measured", "run Go Live to get a score", "/setup") }}
+  {% endif %}
+  {{ stat("Chat this week", answers|number ~ " answers", handoffs|number ~ " sent to a human", "/chat") }}
+  {{ stat("Lessons waiting", lessons_waiting, "need a human's approval", "/lessons") }}
+  {{ stat("Cost this week", cost_week|money, "every model call", "/logs") }}
+</div>
+
+<div class="card" style="margin-top:16px">
+  <h2>Knowledge Brain</h2>
+  <div class="grid four">
+    {{ stat("Pages processed", (stats.pages_processed or 0)|number) }}
+    {{ stat("Pages embedded", (stats.pages_embedded or 0)|number) }}
+    {{ stat("Pages failed", (stats.pages_failed or 0)|number) }}
+    {{ stat("Pages pending", (stats.pages_pending or 0)|number) }}
+  </div>
+  <div class="grid four" style="margin-top:12px">
+    {{ stat("Duplicate URLs skipped", (stats.duplicates_skipped or 0)|number) }}
+    {{ stat("Screenshots described", (stats.images_described or 0)|number) }}
+    {{ stat("Pending URL actions", (stats.pending_actions or 0)|number, "", "/knowledge") }}
+    {{ stat("Last sync", stats.last_sync or "never") }}
+  </div>
+</div>
+
+<div class="grid two">
+  <div class="card">
+    <h2>Self-Improve</h2>
+    {% if latest_run %}
+      <p><a href="/improve/runs/{{ latest_run.id }}">{{ latest_run.title }}</a> {{ badge(latest_run.status) }}</p>
+      <p class="small muted">{{ latest_run.rounds_used }} round(s), {{ latest_run.cost_usd|money(2) }}</p>
+    {% else %}<p class="muted">No runs yet. Send failing eval cases from the Eval Lab.</p>{% endif %}
+  </div>
+  <div class="card">
+    <h2>Background jobs</h2>
+    <p class="small">Queued {{ jobs.get('todo', 0) }} · running {{ jobs.get('doing', 0) }} · done {{ jobs.get('succeeded', 0) }} ·
+      <a href="/logs/failed">failed {{ jobs.get('failed', 0) }}</a></p>
+  </div>
+</div>
+{% endblock %}

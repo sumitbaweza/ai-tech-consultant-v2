@@ -1,0 +1,34 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block settings %}
+<div class="card">
+  <h2>Members</h2>
+  <table>
+    <thead><tr><th>Name</th><th>Email</th><th>Role</th></tr></thead>
+    <tbody>{% for m in members %}<tr><td>{{ m.name }}</td><td>{{ m.email }}</td><td>{{ m.role }}</td></tr>{% endfor %}</tbody>
+  </table>
+</div>
+<div class="card">
+  <h2>Knowledge Brain API keys</h2>
+  <p class="muted">For other apps and developers: every request to the Brain's API carries one of these keys, and the key decides the business. Docs: <a href="{{ brain_url }}/docs" target="_blank" rel="noopener">{{ brain_url }}/docs</a>. A key is shown once, when it is created.</p>
+  <table>
+    <thead><tr><th>Name</th><th>Starts with</th><th>Created</th><th>Last used</th><th></th></tr></thead>
+    <tbody>
+    {% for key in keys %}
+      <tr>
+        <td>{{ key.name }}</td><td><code>{{ key.prefix }}...</code></td><td>{{ key.created_at|when }}</td><td>{{ key.last_used_at|ago }}</td>
+        <td class="right">{% if key.revoked_at %}<span class="badge off">revoked</span>{% elif ctx.is_owner and key.name != 'Web app (internal)' %}
+          <form method="post" action="/settings/api-keys/{{ key.id }}/revoke">{{ csrf_field() }}<button class="btn small danger" type="submit">Revoke</button></form>{% endif %}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% if ctx.is_owner %}
+  <form class="row" style="margin-top:12px" hx-post="/settings/api-keys" hx-target="#new-key" hx-swap="innerHTML">
+    <input name="name" type="text" placeholder="What the key is for" style="max-width:300px" required>
+    <button class="btn" type="submit">Create key</button>
+  </form>
+  <div id="new-key"></div>
+  {% endif %}
+</div>
+{% endblock %}

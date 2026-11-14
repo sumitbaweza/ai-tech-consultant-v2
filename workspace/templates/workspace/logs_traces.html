@@ -1,0 +1,25 @@
+{% extends "workspace/logs_layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block logs %}
+<div class="card">
+  <div class="row" style="margin-bottom:10px">
+    {% for k in ['chat_answer', 'eval_case', 'role_test', 'skill_test', 'job', 'setup'] %}
+    <a class="btn small {{ 'primary' if kind == k else '' }}" href="/logs/traces?kind={{ k }}">{{ k|replace('_', ' ') }}</a>
+    {% endfor %}
+    <a class="btn small" href="/logs/traces">all</a>
+  </div>
+  {% if items %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>When</th><th>Kind</th><th>What</th><th>Status</th><th class="num">Calls</th><th class="num">Cost</th><th class="num">Time</th></tr></thead>
+    <tbody>
+    {% for t in items %}
+      <tr><td class="small">{{ t.started_at|when }}</td><td>{{ t.kind|replace('_', ' ') }}</td>
+        <td><a href="/logs/traces/{{ t.id }}">{{ t.title }}</a></td><td>{{ badge(t.status) }}</td>
+        <td class="num">{{ t.calls }}</td><td class="num">{{ t.cost|money }}</td>
+        <td class="num">{% if t.ms %}{{ (t.ms / 1000)|round(1) }} s{% else %}-{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  {% else %}{{ empty("No traces yet: every chat answer, eval case and job leaves one.") }}{% endif %}
+</div>
+{% endblock %}

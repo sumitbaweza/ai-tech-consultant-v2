@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% from "macros.html" import tabs as tabs_macro %}
+{% block content %}
+<div class="page-head"><h1>Logs and costs</h1><span class="sub">every model call of {{ ctx.business_name }}, with its cost; personal data is masked</span></div>
+{{ tabs_macro(tabs, tab) }}
+{% block logs %}{% endblock %}
+{% endblock %}

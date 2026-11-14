@@ -1,0 +1,12 @@
+{% extends "workspace/settings_layout.html" %}
+{% block settings %}
+<div class="card">
+  <h2>Keys and connections</h2>
+  <p class="muted">Exactly these 5 connections. Keys are encrypted, shown masked, never shown in full again and never written to a log. "Test" makes one small, free call.</p>
+  <div class="stack">
+    {% for kind, info in kinds.items() %}
+      {% with connection = connections[kind] %}{% include "workspace/_connection_row.html" %}{% endwith %}
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

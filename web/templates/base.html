@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{{ title or "" }}{% endblock %}{% if self.title()|trim %} · {% endif %}AI Tech Consultant</title>
+  <link rel="stylesheet" href="/static/app.css">
+  <script src="/static/vendor/htmx.min.js" defer></script>
+  <script src="/static/app.js" defer></script>
+</head>
+<body hx-headers='{"X-CSRF-Token": "{{ csrf }}"}'>
+{% if fake_models %}<div class="banner">Fake models are on (LLM_FAKE=1): every model reply is canned by rules. Development only; nothing here is an eval result.</div>{% endif %}
+{% block shell %}
+<header class="topbar">
+  <a class="brand" href="/">AI Tech <span>Consultant</span></a>
+  {% if ctx and ctx.businesses %}
+  <form class="switcher" method="post" action="/businesses/switch" hx-boost="false">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <select name="business_id" data-autosubmit aria-label="Current business">
+      {% for id, name in ctx.businesses %}
+      <option value="{{ id }}" {% if id == ctx.business_id %}selected{% endif %}>{{ name }}</option>
+      {% endfor %}
+    </select>
+  </form>
+  <a class="small" href="/businesses">All businesses</a>
+  {% endif %}
+  <div class="spacer"></div>
+  {% if ctx %}
+  <span class="muted">{{ ctx.user_name }}{% if ctx.business_id %} · {{ ctx.member_role|capitalize }}{% endif %}</span>
+  <form method="post" action="/logout">
+    <input type="hidden" name="csrf_token" value="{{ csrf }}">
+    <button class="btn small" type="submit">Log out</button>
+  </form>
+  {% endif %}
+</header>
+<div class="shell">
+  <nav class="sidenav" aria-label="Main menu">
+    {% for label, href, key in NAV %}
+    <a href="{{ href }}" class="{{ 'active' if active == key else '' }}">{{ label }}</a>
+    {% endfor %}
+    <div class="group">Developers</div>
+    <a href="http://localhost:8081/docs" target="_blank" rel="noopener">Brain API docs</a>
+  </nav>
+  <main>
+    {% if notice %}<div class="notice {{ notice_kind or 'ok' }}">{{ notice }}</div>{% endif %}
+    {% block content %}{% endblock %}
+  </main>
+</div>
+{% endblock %}
+</body>
+</html>

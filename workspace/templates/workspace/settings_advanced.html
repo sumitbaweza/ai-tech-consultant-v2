@@ -1,0 +1,53 @@
+{% extends "workspace/settings_layout.html" %}
+{% from "macros.html" import csrf_field with context %}
+{% block settings %}
+<div class="card">
+  <h2>Advanced</h2>
+  <p class="muted">Settings most businesses never change. Anything here goes through the same checks as the rest of Settings.</p>
+  <form method="post" action="/settings/advanced">{{ csrf_field() }}
+    <label class="inline"><input type="checkbox" name="local_only" value="true" {% if business.local_only %}checked{% endif %}> Local-only mode</label>
+    <div class="help">Run the whole app on the 2 local models (gemma4:e4b and qwen3.5:4b on your laptop through Ollama), with no paid API at all. Search then uses keywords and typo fixing only. The Eval Lab's Local-only tab shows how much quality drops, step by step.</div>
+    <label class="inline" style="margin-top:12px"><input type="checkbox" name="allow_free_with_customer_data" value="true" {% if advanced.get('allow_free_with_customer_data') %}checked{% endif %}> Allow free models and Gemini to see real customer text</label>
+    <div class="help">Off by default: Gemini's free tier and some free OpenRouter providers may keep prompts, so the app sends them only made-up test data (the benchmark). Turn on only with paid tiers that don't keep data.</div>
+    <div class="grid two">
+      <div>
+        <label for="count_tokens">Token counting before each call</label>
+        <select id="count_tokens" name="count_tokens">
+          <option value="always" {% if advanced.get('count_tokens', 'always') == 'always' %}selected{% endif %}>Always ask Claude's and Gemini's free counters</option>
+          <option value="large_only" {% if advanced.get('count_tokens') == 'large_only' %}selected{% endif %}>Estimate, and ask only for large prompts (faster)</option>
+        </select>
+      </div>
+      <div>
+        <label for="crawl_rate">Crawl speed (pages per second per site)</label>
+        <input id="crawl_rate" name="crawl_rate" type="number" step="0.1" min="0.1" max="5" value="{{ advanced.get('crawl_rate', 1.0) }}">
+        <div class="help">1 page a second is polite for most help centers.</div>
+      </div>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>Save</button></div>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Synonyms</h2>
+  <p class="muted">Words that mean the same in your business. Search already treats word forms alike ("custom", "customize", "customization") and fixes small typos; add business words here ("plan" = "membership").</p>
+  {% if brain_error %}<div class="notice warn">The Knowledge Brain isn't reachable: {{ brain_error }}</div>{% endif %}
+  {% if synonyms %}
+  <table><thead><tr><th>Word</th><th>Means the same as</th></tr></thead>
+  <tbody>{% for s in synonyms %}<tr><td>{{ s.term }}</td><td>{{ s.synonyms|join(', ') }}</td></tr>{% endfor %}</tbody></table>
+  {% endif %}
+  <form method="post" action="/settings/synonyms" class="row" style="margin-top:10px">{{ csrf_field() }}
+    <input name="term" type="text" placeholder="word" style="max-width:180px" required>
+    <input name="synonyms" type="text" placeholder="other words, comma separated" style="max-width:360px" required>
+    <button class="btn" type="submit">Save</button>
+  </form>
+</div>
+
+<div class="card">
+  <h2>Prompt caching proof</h2>
+  <p class="muted">Task 1.3: runs the same chat answers twice, first with caching off, then on, and shows the total $ of each run side by side with the % saved, from the cost ledger. It uses your Claude key: about $1-2 for 100 answers.</p>
+  <form method="post" action="/settings/caching-proof" class="row">{{ csrf_field() }}
+    <label class="inline">Answers <input name="tasks" type="number" min="2" max="100" value="100" style="width:90px"></label>
+    <button class="btn" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>Run the caching proof</button>
+  </form>
+</div>
+{% endblock %}

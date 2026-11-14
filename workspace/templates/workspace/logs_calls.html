@@ -1,0 +1,24 @@
+{% extends "workspace/logs_layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block logs %}
+<div class="card">
+  <p class="muted small">The ledger: one row per model call, ready for billing. Text previews are masked for personal data and cut short; keys are never written.</p>
+  {% if items %}
+  <div class="table-wrap" style="max-height:none"><table>
+    <thead><tr><th>When</th><th>Step</th><th>Model</th><th>Prompt version</th><th class="num">Tokens in/out</th><th class="num">Cost</th><th class="num">ms</th><th>Status</th><th>Request (masked)</th></tr></thead>
+    <tbody>
+    {% for c in items %}
+    <tr><td class="small">{{ c.created_at|when }}</td><td>{{ c.step }}</td><td>{{ c.model_key }}</td>
+      <td class="small">{{ c.prompt_key or '' }}</td><td class="num small">{{ c.input_tokens|number }} / {{ c.output_tokens|number }}</td>
+      <td class="num">{{ c.cost_usd|money(6) }}</td><td class="num">{{ c.latency_ms }}</td><td>{{ badge(c.status) }}</td>
+      <td class="small" style="max-width:360px">{{ (c.request_preview or '')[:160] }}{% if c.error %}<div class="faint">{{ c.error }}</div>{% endif %}</td></tr>
+    {% endfor %}
+    </tbody>
+  </table></div>
+  <div class="row" style="margin-top:10px">
+    {% if page_no > 1 %}<a class="btn small" href="?page_no={{ page_no - 1 }}">Newer</a>{% endif %}
+    {% if items|length == size %}<a class="btn small" href="?page_no={{ page_no + 1 }}">Older</a>{% endif %}
+  </div>
+  {% else %}{{ empty("No model calls yet.") }}{% endif %}
+</div>
+{% endblock %}
