@@ -1,0 +1,196 @@
+# The whole app starts with one command: `make up`, or `docker compose up -d --build`.
+# Values like ${SECRET_KEY} come from the .env file next to this one.
+name: ai-tech-consultant-v2
+
+x-app: &app
+  build:
+    context: .
+    target: runtime
+  image: ai-tech-consultant-v2:dev
+  environment:
+    DB_HOST: postgres
+    DB_PORT: "5432"
+    OWNER_DB_PASSWORD: ${OWNER_DB_PASSWORD:?Set OWNER_DB_PASSWORD in .env}
+    WEB_DB_PASSWORD: ${WEB_DB_PASSWORD:?Set WEB_DB_PASSWORD in .env}
+    BRAIN_DB_PASSWORD: ${BRAIN_DB_PASSWORD:?Set BRAIN_DB_PASSWORD in .env}
+    SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+    BRAIN_API_URL: http://brain:8081
+    PUBLIC_URL: ${PUBLIC_URL:-http://localhost:8080}
+    # Platform-level services (not a business connection): Google's OAuth app for Gmail sign-in,
+    # Voyage for embeddings, GitHub for the Self-Improve Loop's pull requests. All may be empty.
+    GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+    GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+    GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+    GITHUB_REPO: ${GITHUB_REPO:-}
+    # Ollama runs on your laptop, outside Docker; containers reach it through the host gateway
+    OLLAMA_URL: ${OLLAMA_URL:-http://host.docker.internal:11434}
+    STORAGE_DIR: /data/storage
+    # 1 = canned model replies, for trying the app with no key and no cost (never for evals)
+    LLM_FAKE: ${LLM_FAKE:-false}
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+  volumes:
+    - storage:/data/storage
+
+services:
+  postgres:
+    # Postgres 18 with pgvector 0.8.7, as the brief requires
+    image: pgvector/pgvector:0.8.7-pg18
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: consultant
+      OWNER_DB_PASSWORD: ${OWNER_DB_PASSWORD}
+      WEB_DB_PASSWORD: ${WEB_DB_PASSWORD}
+      BRAIN_DB_PASSWORD: ${BRAIN_DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5442:5432"
+    volumes:
+      # Postgres 18 images keep their data under /var/lib/postgresql/18/...
+      - pgdata:/var/lib/postgresql
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d consultant"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  # Migrations (tables, row-level security, grants, the job queue), then exits
+  migrate:
+    <<: *app
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  # Demo users, two demo businesses and the Solution Center snapshot, once; then exits
+  seed:
+    <<: *app
+    command: ["python", "-m", "scripts.seed"]
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+
+  # Feature 2: the Knowledge Brain's API, the only door to its data. Docs: http://localhost:8081/docs
+  brain:
+    <<: *app
+    command: ["uvicorn", "knowledge_brain.api.main:app", "--host", "0.0.0.0", "--port", "8081"]
+    ports:
+      - "127.0.0.1:8081:8081"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8081/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
+  # Every screen, and the APIs of Features 1, 3, 4, 5 and 6: http://localhost:8080
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:8080:8080"
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8080/health')"]
+      interval: 10s
+      timeout: 3s
+      retries: 6
+    restart: unless-stopped
+
+  # Background jobs for the Brain: crawls, rechecks, screenshots, embeddings, Gmail threads
+  worker-brain:
+    <<: *app
+    command: ["procrastinate", "--app=knowledge_brain.worker.app", "worker", "--queues=brain", "--concurrency=2"]
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # Background jobs for everything else: eval runs, lessons, Opus runs, setup, the weekly email
+  worker-web:
+    <<: *app
+    command: ["procrastinate", "--app=web.worker.app", "worker", "--queues=web", "--concurrency=2"]
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # The Self-Improve Loop (Feature 5): the only service with the repo mounted, because it
+  # makes branches, merges and reverts, and scores a branch by running its code. One run at a time.
+  worker-improve:
+    <<: *app
+    command: ["procrastinate", "--app=web.worker.app", "worker", "--queues=improve", "--concurrency=1"]
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      OWNER_DB_PASSWORD: ${OWNER_DB_PASSWORD:?Set OWNER_DB_PASSWORD in .env}
+      WEB_DB_PASSWORD: ${WEB_DB_PASSWORD:?Set WEB_DB_PASSWORD in .env}
+      BRAIN_DB_PASSWORD: ${BRAIN_DB_PASSWORD:?Set BRAIN_DB_PASSWORD in .env}
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY in .env}
+      BRAIN_API_URL: http://brain:8081
+      VOYAGE_API_KEY: ${VOYAGE_API_KEY:-}
+      GITHUB_TOKEN: ${GITHUB_TOKEN:-}
+      GITHUB_REPO: ${GITHUB_REPO:-}
+      STORAGE_DIR: /data/storage
+      SELF_IMPROVE_REPO: /repo
+      LLM_FAKE: ${LLM_FAKE:-false}
+    volumes:
+      - storage:/data/storage
+      - .:/repo
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  # The Brain as MCP tools for agents: http://localhost:8082/mcp
+  mcp:
+    <<: *app
+    command: ["python", "-m", "knowledge_brain.mcp_server", "--http"]
+    environment:
+      BRAIN_API_URL: http://brain:8081
+      BRAIN_MCP_API_KEY: ${BRAIN_MCP_API_KEY:-}
+    ports:
+      - "127.0.0.1:8082:8082"
+    depends_on:
+      brain:
+        condition: service_healthy
+    restart: unless-stopped
+
+  # A small test website for the 10 URL benchmark cases (301, 404, nested, duplicate, recovered)
+  fixture-site:
+    <<: *app
+    command: ["uvicorn", "benchmark.url_site.app:app", "--host", "0.0.0.0", "--port", "8083"]
+    ports:
+      - "127.0.0.1:8083:8083"
+    profiles: ["eval"]
+
+  # Tests, lint and type checks against the live source: `make test`, `make lint`
+  tools:
+    build:
+      context: .
+      target: dev
+    image: ai-tech-consultant-v2:tools
+    environment:
+      DB_HOST: postgres
+      DB_PORT: "5432"
+      DB_NAME: consultant_test
+      OWNER_DB_PASSWORD: ${OWNER_DB_PASSWORD}
+      WEB_DB_PASSWORD: ${WEB_DB_PASSWORD}
+      BRAIN_DB_PASSWORD: ${BRAIN_DB_PASSWORD}
+      SECRET_KEY: ${SECRET_KEY}
+    volumes:
+      - .:/app
+    profiles: ["tools"]
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  pgdata:
+  storage:

@@ -1,0 +1,7 @@
+# Same line endings on Windows and in Docker, so the Self-Improve worker sees a clean tree
+* text=auto eol=lf
+*.gz binary
+*.png binary
+*.jpg binary
+*.pdf binary
+*.ico binary

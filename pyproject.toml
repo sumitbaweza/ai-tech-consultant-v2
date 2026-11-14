@@ -1,0 +1,77 @@
+[project]
+name = "ai-tech-consultant"
+version = "2.0.0"
+description = "A multi-business AI Tech Consultant: a Knowledge Brain, an Ask and Teach Chat, an Eval Lab across 14 models, a Self-Improve Loop and a 15-minute setup."
+requires-python = ">=3.14"
+dependencies = [
+    "alembic>=1.20",
+    "anthropic>=2.3",
+    "beautifulsoup4>=4.13",
+    "claude-agent-sdk>=0.1",
+    "cryptography>=45",
+    "fastapi>=0.162",
+    "httpx>=0.28",
+    "jinja2>=3.1",
+    "markdownify>=1.2",
+    "mcp>=2.3",
+    "pgvector>=0.5",
+    "procrastinate>=3.0",
+    "protego>=0.4",
+    "psycopg[binary,pool]>=3.2",
+    "pydantic>=2.14",
+    "pydantic-settings>=2.10",
+    "pypdf>=5",
+    "python-docx>=1.1",
+    "python-multipart>=0.0.20",
+    "pyyaml>=6",
+    "sqlalchemy[asyncio]>=2.1",
+    "uvicorn>=0.54",
+]
+
+[dependency-groups]
+dev = [
+    "pyright>=1.1.414",
+    "pytest>=9.2",
+    "pytest-asyncio>=1.4",
+    "respx>=0.23",
+    "ruff>=0.17",
+    "types-pyyaml>=6.0",
+]
+
+[tool.uv]
+package = false
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+extend-exclude = ["ux"]
+
+[tool.ruff.lint]
+# pycodestyle, pyflakes, import order, bugbear, modern syntax, simplifications, async pitfalls, ruff's own
+select = ["E", "W", "F", "I", "B", "UP", "SIM", "ASYNC", "RUF"]
+# The formatter wraps code; long strings (SQL, HTML, messages) read better on one line
+ignore = ["E501"]
+
+[tool.ruff.lint.per-file-ignores]
+# SQLAlchemy reads __table_args__ as a plain class attribute
+"**/models.py" = ["RUF012"]
+# The improve worker runs one job at a time: its few small file operations don't need threads
+"self_improve/*.py" = ["ASYNC240"]
+
+[tool.ruff.lint.flake8-bugbear]
+# FastAPI's dependency markers are meant to be called in defaults
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Form", "fastapi.Query", "fastapi.File"]
+
+[tool.pyright]
+include = ["core", "workspace", "knowledge_brain", "ask_teach_chat", "eval_lab", "self_improve", "go_live", "web", "migrations", "benchmark", "scripts", "tests"]
+exclude = ["migrations/versions", "**/__pycache__", ".venv"]
+typeCheckingMode = "strict"
+pythonVersion = "3.14"
+reportMissingTypeStubs = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+markers = ["db: needs the Postgres from docker compose; skipped when it isn't reachable"]
