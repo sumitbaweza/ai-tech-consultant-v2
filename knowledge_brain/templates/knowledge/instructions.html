@@ -1,0 +1,42 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block knowledge %}
+<div class="card">
+  <p class="muted">Rules in plain words that every answer follows, for all roles or only the roles you pick. Example: "Never promise a refund. Send every refund question to the Billing team."</p>
+</div>
+{% for item in items %}
+<div class="card">
+  <form method="post" action="/knowledge/instructions">{{ csrf_field() }}<input type="hidden" name="id" value="{{ item.id }}">
+    <div class="row"><input name="title" type="text" value="{{ item.title }}" style="max-width:420px" required>
+      {{ badge('on' if item.enabled else 'off', 'ok' if item.enabled else 'off') }}</div>
+    <textarea name="body" style="min-height:70px; margin-top:8px" required>{{ item.body }}</textarea>
+    <div class="row" style="margin-top:8px">
+      <label class="inline"><input type="checkbox" name="enabled" value="true" {% if item.enabled %}checked{% endif %}> On</label>
+      <label class="inline"><input type="checkbox" name="all_roles" value="true" {% if item.all_roles %}checked{% endif %}> All roles</label>
+      <span class="muted small">or only:</span>
+      {% for role in roles %}<label class="inline"><input type="checkbox" name="role_ids" value="{{ role.id }}" {% if role.id|string in item.role_ids|map('string')|list %}checked{% endif %}> {{ role.name }}</label>{% endfor %}
+    </div>
+    {% if ctx.is_owner %}<div class="form-actions"><button class="btn small primary" type="submit">Save</button>
+      <button class="btn small danger" type="submit" formaction="/knowledge/instructions/{{ item.id }}/delete" hx-confirm="Delete this instruction?">Delete</button></div>{% endif %}
+  </form>
+</div>
+{% else %}
+<div class="card">{{ empty("No instructions yet.") }}</div>
+{% endfor %}
+{% if ctx.is_owner %}
+<div class="card">
+  <h2>New instruction</h2>
+  <form method="post" action="/knowledge/instructions">{{ csrf_field() }}
+    <input name="title" type="text" placeholder="Short title, e.g. Refunds" required>
+    <textarea name="body" style="min-height:70px; margin-top:8px" placeholder="The rule, in plain words" required></textarea>
+    <div class="row" style="margin-top:8px">
+      <input type="hidden" name="enabled" value="true">
+      <label class="inline"><input type="checkbox" name="all_roles" value="true" checked> All roles</label>
+      <span class="muted small">or only:</span>
+      {% for role in roles %}<label class="inline"><input type="checkbox" name="role_ids" value="{{ role.id }}"> {{ role.name }}</label>{% endfor %}
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Add instruction</button></div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

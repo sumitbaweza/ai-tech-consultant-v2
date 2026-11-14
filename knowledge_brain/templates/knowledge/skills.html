@@ -1,0 +1,32 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block actions %}{% if ctx.is_owner %}<a class="btn primary" href="/knowledge/skills/new">New skill</a>{% endif %}{% endblock %}
+{% block knowledge %}
+<div class="card">
+  <p class="muted">Step-by-step guides the agent follows for one kind of work. The agent picks the right skill for each question by itself. Every change is a new version; the release gate checks it before it goes live. Skills are also under Settings &gt; Skills.</p>
+  {% if skills %}<table>
+    <thead><tr><th>Skill</th><th>When to use</th><th>Live</th><th>Waiting changes</th></tr></thead>
+    <tbody>{% for s in skills %}<tr><td><a href="/knowledge/skills/{{ s.id }}"><strong>{{ s.name }}</strong></a><div class="small faint">{{ s.key }}</div></td>
+      <td class="small">{{ s.live.when_to_use if s.live else '' }}</td><td>{% if s.live %}v{{ s.live.version }} {{ badge(s.live.author, 'info') }}{% else %}{{ badge('draft') }}{% endif %}</td>
+      <td>{% if s.proposals %}{{ badge(s.proposals ~ ' waiting', 'warn') }}{% endif %}</td></tr>{% endfor %}</tbody>
+  </table>{% else %}{{ empty("No skills yet. Write one, let the agent draft one, or let Claude Opus propose some from notes on past emails.") }}{% endif %}
+</div>
+{% if proposals %}
+<div class="card">
+  <h2>Proposed skill changes</h2>
+  <p class="muted small">Suggested by Claude Opus 5.5 from notes on past emails, or from a lesson. Nothing is used until you approve it.</p>
+  {% for p in proposals %}
+  <div class="card tight">
+    <div class="row"><strong>{{ p.name }}</strong>{{ badge('new skill' if not p.skill_id else 'change', 'info') }}{{ badge(p.origin|replace('_', ' '), 'info') }}<span class="small faint">{{ p.created_at|when }}</span></div>
+    <p class="small">{{ p.rationale }}</p>
+    <ul class="small">{% for c in p.changes %}<li>{{ c }}</li>{% endfor %}</ul>
+    {% if p.note_ids %}<p class="small faint">From {{ p.note_ids|length }} note(s) on past emails.</p>{% endif %}
+    <details><summary class="small">The proposed skill</summary>{{ markdown(p.markdown) }}</details>
+    {% if ctx.is_owner %}<div class="row" style="margin-top:8px">
+      <form method="post" action="/knowledge/proposals/{{ p.id }}/approve">{{ csrf_field() }}<button class="btn small primary" type="submit">Approve</button></form>
+      <form method="post" action="/knowledge/proposals/{{ p.id }}/reject">{{ csrf_field() }}<button class="btn small" type="submit">Reject</button></form></div>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

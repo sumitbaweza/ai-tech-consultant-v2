@@ -1,0 +1,46 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block knowledge %}
+<form id="skill-form" method="post" action="{{ '/knowledge/skills/' ~ skill.id if skill else '/knowledge/skills' }}">{{ csrf_field() }}
+<div class="split">
+  <div class="card">
+    <div class="row"><h2 style="margin:0">{{ skill.name if skill else 'New skill' }}</h2>{% if live %}<span class="badge live">live v{{ live.version }}</span>{% endif %}</div>
+    <p class="small muted">Markdown with: a "# Name", "## When to use", "## Steps" (numbered), "## Examples" (1 or 2).</p>
+    <textarea id="markdown" name="markdown" class="code" required>{{ markdown }}</textarea>
+    {% if skill %}<label for="note">What changed (optional)</label><input id="note" name="note" type="text">{% endif %}
+    <div class="form-actions"><button class="btn primary" type="submit" {% if not ctx.is_owner %}disabled{% endif %}>{{ 'Save as a new version' if skill else 'Create skill' }}</button></div>
+    {% if not skill %}
+    <hr>
+    <h3>Or let the agent draft it</h3>
+    <div class="row"><input name="description" type="text" placeholder="e.g. How to answer a domain setup question" style="max-width:420px">
+      <button class="btn" type="button" hx-post="/knowledge/skill-draft" hx-include="[name=description]" hx-target="#draft">Draft it<span class="spinner"> ...</span></button></div>
+    <div id="draft" style="margin-top:10px"></div>
+    {% endif %}
+  </div>
+  <div class="card">
+    <h2>Test this skill</h2>
+    <p class="muted small">Answers with the text on the left, saved or not.</p>
+    <textarea name="question" placeholder="A question this skill is for" style="min-height:80px"></textarea>
+    <div class="form-actions"><button class="btn" type="button" hx-post="/knowledge/skill-test" hx-include="#skill-form" hx-target="#skill-test-result">Ask<span class="spinner"> ...</span></button></div>
+    <div id="skill-test-result" style="margin-top:10px"></div>
+  </div>
+</div>
+</form>
+{% if versions %}
+<div class="card">
+  <h2>Versions</h2>
+  <table><thead><tr><th>Version</th><th>Status</th><th>Author</th><th>When</th><th>Note</th><th></th></tr></thead>
+  <tbody>{% for v in versions %}<tr><td>v{{ v.version }}</td><td>{{ badge(v.status) }}</td><td>{{ badge(v.author, 'info') }}</td><td class="small">{{ v.created_at|when }}</td><td class="small">{{ v.note or '' }}</td>
+    <td class="right">{% if ctx.is_owner and v.status != 'live' %}<form method="post" action="/knowledge/skills/{{ skill.id }}/restore">{{ csrf_field() }}<input type="hidden" name="version_id" value="{{ v.id }}"><button class="btn small" type="submit">Restore</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table>
+</div>
+{% endif %}
+{% if proposals %}
+<div class="card">
+  <h2>Proposed changes</h2>
+  {% for p in proposals %}<div class="card tight"><div class="row"><strong>{{ p.name }}</strong>{{ badge(p.status) }}</div><p class="small">{{ p.rationale }}</p>
+    <ul class="small">{% for c in p.changes %}<li>{{ c }}</li>{% endfor %}</ul>
+    {% if p.status == 'pending' and ctx.is_owner %}<div class="row"><form method="post" action="/knowledge/proposals/{{ p.id }}/approve">{{ csrf_field() }}<input type="hidden" name="next_url" value="/knowledge/skills/{{ skill.id }}"><button class="btn small primary" type="submit">Approve</button></form>
+      <form method="post" action="/knowledge/proposals/{{ p.id }}/reject">{{ csrf_field() }}<input type="hidden" name="next_url" value="/knowledge/skills/{{ skill.id }}"><button class="btn small" type="submit">Reject</button></form></div>{% endif %}</div>{% endfor %}
+</div>
+{% endif %}
+{% endblock %}

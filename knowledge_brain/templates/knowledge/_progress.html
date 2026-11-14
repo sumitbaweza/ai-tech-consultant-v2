@@ -1,0 +1,11 @@
+{% if progress.total %}
+<div class="row" style="margin-bottom:8px"><strong>{{ progress.kind|default('read')|replace('_', ' ')|capitalize }}</strong>
+  <span class="badge {{ progress.status }}">{{ progress.status }}</span>
+  <span class="muted">{{ progress.done|number }} of {{ progress.total|number }} pages · {{ progress.percent }}%</span>
+  {% if progress.status == 'running' %}<span class="muted">· about {{ progress.minutes_left }} min left</span>{% endif %}</div>
+<div class="progress"><div style="width: {{ progress.percent }}%"></div></div>
+<p class="small muted" style="margin-top:8px">New {{ progress.new }} · changed {{ progress.changed }} · failed {{ progress.failed }}
+  {% if progress.run_id %} · <a href="/knowledge/runs/{{ progress.run_id }}">this run's URL list</a>{% endif %}</p>
+{% else %}
+<p class="muted">Nothing is being read. {% if progress.status == 'planned' %}Confirm the plan to start.{% endif %}</p>
+{% endif %}

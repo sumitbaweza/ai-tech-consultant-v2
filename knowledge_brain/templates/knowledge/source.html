@@ -1,0 +1,90 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block knowledge %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">{{ source.label }}</h2>{{ badge(source.status) }}
+    <span class="muted small">{{ source.kind|replace('_', ' ') }} · every {{ source.recheck_days or '-' }} day(s) · last sync {{ source.last_synced_at|ago }} · next {{ source.next_check_at|when }}</span>
+    <span style="flex:1"></span>
+    {% if ctx.is_owner %}<form method="post" action="/knowledge/sources/{{ source.id }}/recheck">{{ csrf_field() }}<button class="btn small" type="submit">Recheck now</button></form>{% endif %}
+  </div>
+  <p class="small" style="margin:8px 0 0">Active {{ source.levels.get('active', 0)|number }} · Watch {{ source.levels.get('watch', 0)|number }} · Quarantined {{ source.levels.get('quarantined', 0)|number }} · Archived {{ source.levels.get('archived', 0)|number }}</p>
+</div>
+{% set base = '/knowledge/sources/' ~ source.id %}
+<nav class="tabs">
+  {% for key, label in [('progress', 'Progress'), ('pages', 'Pages'), ('runs', 'Refresh runs'), ('health', 'URL health'), ('changes', 'Change history'), ('archived', 'Archived')] %}
+  <a href="{{ base }}?tab={{ key }}" class="{{ 'active' if stab == key else '' }}">{{ label }}</a>
+  {% endfor %}
+</nav>
+
+{% if stab == 'progress' %}
+  <div class="card" hx-get="{{ base }}/progress" hx-trigger="every 2s" hx-swap="innerHTML">{% include "knowledge/_progress.html" %}</div>
+
+{% elif stab == 'pages' %}
+  <div class="card">
+    <form class="row" method="get" action="{{ base }}"><input type="hidden" name="tab" value="pages">
+      <input name="q" type="text" value="{{ q or '' }}" placeholder="Find a URL or title" style="max-width:300px">
+      <select name="level"><option value="">every level</option>{% for l in ['active', 'watch', 'quarantined', 'archived'] %}<option {% if level == l %}selected{% endif %}>{{ l }}</option>{% endfor %}</select>
+      <button class="btn small" type="submit">Filter</button><span class="muted small">{{ pages.total|number }} page(s)</span></form>
+    <div class="table-wrap" style="margin-top:10px"><table>
+      <thead><tr><th>Page</th><th>Level</th><th class="num">Misses</th><th class="num">HTTP</th><th>Read</th><th>Changed</th></tr></thead>
+      <tbody>{% for p in pages.pages %}<tr><td><a href="/knowledge/pages/{{ p.id }}">{{ p.title or p.url }}</a><div class="small faint">{{ p.url }}{% if p.kind == 'listing' %} · listing (not embedded){% endif %}</div>{% if p.error %}<div class="small" style="color:var(--warn)">{{ p.error }}</div>{% endif %}</td>
+        <td>{{ badge(p.level) }}</td><td class="num">{{ p.miss_count }}</td><td class="num">{{ p.http_status or '-' }}</td><td class="small">{{ p.fetch_state }}</td><td class="small">{{ p.changed_at|ago }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </div>
+
+{% elif stab == 'runs' %}
+  <div class="card">
+    {% if runs %}<table>
+      <thead><tr><th>Started</th><th>Kind</th><th>Status</th><th class="num">URLs</th><th class="num">New</th><th class="num">Changed</th><th class="num">Missing</th><th class="num">Moved</th><th class="num">Failed</th></tr></thead>
+      <tbody>{% for r in runs %}<tr><td><a href="/knowledge/runs/{{ r.id }}">{{ r.started_at|when }}</a></td><td>{{ r.kind|replace('_', ' ') }}</td><td>{{ badge(r.status) }}</td>
+        <td class="num">{{ r.urls_total|number }}</td><td class="num">{{ r.new_pages }}</td><td class="num">{{ r.changed }}</td><td class="num">{{ r.missing }}</td><td class="num">{{ r.moved }}</td><td class="num">{{ r.failed }}</td></tr>{% endfor %}</tbody>
+    </table>{% else %}{{ empty("No runs yet.") }}{% endif %}
+  </div>
+
+{% elif stab == 'health' %}
+  <div class="card">
+    <h2>Pending actions</h2>
+    <p class="muted small">URLs that answered 404 or were missing from the sitemap {{ source.miss_threshold }} or more times in a row (X). Nothing happens until you apply it. Rule: {{ source.action_rule|replace('_', ' ') }}.</p>
+    {% if pending %}
+    <form method="post" action="/knowledge/health/apply">{{ csrf_field() }}<input type="hidden" name="next" value="{{ base }}?tab=health">
+      <table><thead><tr><th></th><th>URL</th><th>Level now</th><th class="num">Count</th><th>Proposed</th></tr></thead>
+      <tbody>{% for p in pending %}<tr><td><input type="checkbox" name="page_id" value="{{ p.id }}" checked></td><td class="small">{{ p.url }}</td><td>{{ badge(p.level) }}</td><td class="num">{{ p.miss_count }}</td><td>{{ badge(p.proposed_action, 'warn') }}</td></tr>{% endfor %}</tbody></table>
+      {% if ctx.is_owner %}<div class="form-actions"><button class="btn primary" type="submit">Apply to the ticked URLs</button></div>{% endif %}
+    </form>
+    {% else %}{{ empty("Nothing pending.") }}{% endif %}
+  </div>
+  <div class="grid two">
+    <div class="card"><h3>Watch ({{ watch.total }})</h3><p class="small muted">Still in answers; counting misses.</p>
+      {% for p in watch.pages %}<div class="small">{{ p.url }} · {{ p.miss_count }}x · HTTP {{ p.http_status or '-' }}</div>{% else %}<p class="faint small">none</p>{% endfor %}</div>
+    <div class="card"><h3>Quarantined ({{ quarantined.total }})</h3><p class="small muted">Never in answers.</p>
+      {% for p in quarantined.pages %}<div class="row small">{{ p.url }}{% if ctx.is_owner %}<form method="post" action="/knowledge/pages/{{ p.id }}/restore">{{ csrf_field() }}<input type="hidden" name="next_url" value="{{ base }}?tab=health"><button class="btn small" type="submit">Restore</button></form>{% endif %}</div>{% else %}<p class="faint small">none</p>{% endfor %}</div>
+  </div>
+  {% if ctx.is_owner %}
+  <div class="card">
+    <h3>Health settings</h3>
+    <form class="row" method="post" action="{{ base }}/settings">{{ csrf_field() }}
+      <label class="inline">Check every <select name="recheck_days">{% for d in [1, 7, 15, 30] %}<option value="{{ d }}" {% if source.recheck_days == d %}selected{% endif %}>{{ d }} day(s)</option>{% endfor %}</select></label>
+      <label class="inline">X <input name="miss_threshold" type="number" min="1" max="60" value="{{ source.miss_threshold }}" style="width:70px"></label>
+      <label class="inline">Then <select name="action_rule">{% for r in ['quarantine_then_archive', 'quarantine', 'archive'] %}<option value="{{ r }}" {% if source.action_rule == r %}selected{% endif %}>{{ r|replace('_', ' ') }}</option>{% endfor %}</select></label>
+      <button class="btn small" type="submit">Save</button></form>
+  </div>
+  {% endif %}
+
+{% elif stab == 'changes' %}
+  <div class="card">
+    {% if changes %}<table><thead><tr><th>When</th><th>Page</th><th>Version</th><th class="num">Lines +/-</th></tr></thead>
+    <tbody>{% for c in changes %}<tr><td class="small">{{ c.created_at|when }}</td><td><a href="/knowledge/pages/{{ c.page_id }}">{{ c.title or c.url }}</a></td><td>v{{ c.version }} {{ badge(c.change, 'info') }}</td><td class="num small">+{{ c.lines_added }} / -{{ c.lines_removed }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("No page has changed since it was first read.") }}{% endif %}
+  </div>
+
+{% elif stab == 'archived' %}
+  <div class="card">
+    <h2>Archived Knowledge Base</h2>
+    <p class="muted small">Never in answers, never deleted: kept for audits and recovery.</p>
+    {% if archived.pages %}<table><thead><tr><th>Page</th><th class="num">Misses</th><th></th></tr></thead>
+    <tbody>{% for p in archived.pages %}<tr><td><a href="/knowledge/pages/{{ p.id }}">{{ p.title or p.url }}</a><div class="small faint">{{ p.url }}</div></td><td class="num">{{ p.miss_count }}</td>
+      <td class="right">{% if ctx.is_owner %}<form method="post" action="/knowledge/pages/{{ p.id }}/restore">{{ csrf_field() }}<input type="hidden" name="next_url" value="{{ base }}?tab=archived"><button class="btn small" type="submit">Restore</button></form>{% endif %}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("Nothing archived.") }}{% endif %}
+  </div>
+{% endif %}
+{% endblock %}

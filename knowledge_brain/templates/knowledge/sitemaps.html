@@ -1,0 +1,46 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block knowledge %}
+{% if error %}<div class="notice bad">The Knowledge Brain isn't answering: {{ error }}</div>{% endif %}
+{% if pending_count %}<div class="notice warn">{{ pending_count }} URL(s) are waiting for your decision (404 or missing from the sitemap X times in a row). Open a sitemap's <strong>URL health</strong> tab.</div>{% endif %}
+<div class="card">
+  {% if sources %}
+  <table>
+    <thead><tr><th>Sitemap</th><th class="num">Pages</th><th class="num">Active</th><th class="num">Watch</th><th class="num">Quarantined</th><th class="num">Archived</th><th>Status</th><th>Next check</th></tr></thead>
+    <tbody>
+    {% for s in sources %}
+      <tr>
+        <td><a href="/knowledge/sources/{{ s.id }}"><strong>{{ s.label }}</strong></a><div class="small faint">every {{ s.recheck_days or '-' }} day(s) · last sync {{ s.last_synced_at|ago }}</div></td>
+        <td class="num">{{ s.pages|number }}</td>
+        <td class="num">{{ s.levels.get('active', 0)|number }}</td><td class="num">{{ s.levels.get('watch', 0)|number }}</td>
+        <td class="num">{{ s.levels.get('quarantined', 0)|number }}</td><td class="num">{{ s.levels.get('archived', 0)|number }}</td>
+        <td>{{ badge(s.status) }}{% if s.status == 'planned' %} <a class="small" href="/knowledge/sources/{{ s.id }}/plan">see the plan</a>{% endif %}</td>
+        <td class="small">{{ s.next_check_at|when }}</td>
+      </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}{{ empty("No sitemap yet. Add one below: any site's sitemap works (a help center, a blog, a store, a docs site).") }}{% endif %}
+</div>
+
+{% if ctx.is_owner %}
+<div class="card">
+  <h2>Add sitemaps</h2>
+  <p class="muted small">One URL per line. Each is checked as you type; nested sitemaps are found automatically. You'll see the plan (totals, first and last URL, how long it takes) before anything is read.</p>
+  <form method="post" action="/knowledge/sitemaps">{{ csrf_field() }}
+    <textarea name="urls" style="min-height:70px" placeholder="https://support.example.com/sitemap.xml" required
+      hx-post="/knowledge/sitemaps/check" hx-trigger="keyup changed delay:700ms" hx-target="#sitemap-check"></textarea>
+    <div id="sitemap-check" style="margin-top:6px"></div>
+    <div class="grid three">
+      <div><label for="recheck_days">Check again</label>
+        <select id="recheck_days" name="recheck_days"><option value="1">Daily</option><option value="7">Weekly</option><option value="15">Every 15 days</option><option value="30">Every 30 days</option></select></div>
+      <div><label for="miss_threshold">X: misses in a row before an action</label>
+        <select id="miss_threshold" name="miss_threshold"><option value="1">Right away (1)</option><option value="2" selected>2</option><option value="15">15</option><option value="30">30</option></select></div>
+      <div><label for="action_rule">Then</label>
+        <select id="action_rule" name="action_rule"><option value="quarantine_then_archive">Quarantine, then archive</option><option value="quarantine">Quarantine only</option><option value="archive">Archive</option></select></div>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Plan the read<span class="spinner"> (finding every URL...)</span></button></div>
+  </form>
+</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, stat with context %}
+{% block knowledge %}
+<div class="card">
+  <h2>Plan the read: {{ source.label }}</h2>
+  <p class="muted">Nothing has been read yet. Check the plan, then confirm.</p>
+  <div class="grid four">
+    {{ stat("Sitemaps", plan.sitemap_count|number) }}
+    {{ stat("URLs listed", plan.urls_listed|number, (plan.unique_urls|number) ~ " different pages") }}
+    {{ stat("Duplicates", plan.duplicate_count|number, "listed in more than one sitemap") }}
+    {{ stat("Time to read", (plan.minutes ~ " min") if plan.minutes is not none else "-", "finishes about " ~ (plan.finish_at|when)) }}
+  </div>
+  <p class="small" style="margin-top:10px">At the polite speed: {{ plan.pages_per_hour|number }} pages per hour, {{ plan.pages_per_day|number }} pages per day. First URL: <code>{{ plan.first_url or '-' }}</code> · last URL: <code>{{ plan.last_url or '-' }}</code></p>
+</div>
+<div class="card">
+  <h2>Every sitemap</h2>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Sitemap</th><th class="num">URLs</th><th>First URL</th><th>Last URL</th></tr></thead>
+    <tbody>
+    {% for s in plan.sitemaps %}
+      <tr><td style="padding-left: {{ 10 + s.depth * 18 }}px">{% if s.depth %}└ {% endif %}<code class="small">{{ s.url }}</code>{% if s.is_index %} <span class="badge info">index</span>{% endif %}
+        {% if s.error %}<div class="small" style="color:var(--bad)">{{ s.error }}</div>{% endif %}</td>
+        <td class="num">{{ s.urls|number if not s.is_index else '-' }}</td>
+        <td class="small">{{ s.first_url or '' }}</td><td class="small">{{ s.last_url or '' }}</td></tr>
+    {% endfor %}
+      <tr><td><strong>Total</strong></td><td class="num"><strong>{{ plan.urls_listed|number }}</strong></td><td></td><td></td></tr>
+    </tbody>
+  </table></div>
+</div>
+{% if plan.duplicates %}
+<div class="card">
+  <h2>Duplicate URLs</h2>
+  <p class="muted small">Read once; every sitemap that lists them is kept.</p>
+  <div class="table-wrap"><table><thead><tr><th>URL</th><th>Found in</th></tr></thead>
+  <tbody>{% for d in plan.duplicates %}<tr><td class="small">{{ d.url }}</td><td class="small">{{ d.sitemaps|join(', ') }}</td></tr>{% endfor %}</tbody></table></div>
+</div>
+{% endif %}
+{% if ctx.is_owner %}
+<div class="card">
+  <form method="post" action="/knowledge/sources/{{ source.id }}/start" class="row">{{ csrf_field() }}
+    <button class="btn primary" type="submit">Confirm and start reading</button>
+    <label class="inline">or read the first <input name="starter_pages" type="number" min="1" placeholder="150" style="width:90px"> pages now, the rest right after</label>
+  </form>
+  <form method="post" action="/knowledge/sources/{{ source.id }}/delete" style="margin-top:10px">{{ csrf_field() }}
+    <button class="btn small danger" type="submit">Cancel and remove</button></form>
+</div>
+{% endif %}
+{% endblock %}

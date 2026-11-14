@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "macros.html" import tabs as tabs_macro %}
+{% block content %}
+<div class="page-head"><h1>Knowledge</h1><span class="sub">everything the agent knows, by type; every answer shows which type it used</span>
+  <div class="actions">{% block actions %}{% endblock %}</div></div>
+{{ tabs_macro(tabs, tab) }}
+{% block knowledge %}{% endblock %}
+{% endblock %}

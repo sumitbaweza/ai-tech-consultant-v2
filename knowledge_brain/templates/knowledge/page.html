@@ -1,0 +1,23 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import badge %}
+{% block knowledge %}
+{% set p = page_data %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">{{ p.title or p.url }}</h2>{{ badge(p.level) }}</div>
+  <p class="small muted">{{ p.breadcrumb or '' }} · <a href="{{ p.url }}" target="_blank" rel="noopener noreferrer">{{ p.url }}</a> · HTTP {{ p.http_status or '-' }} · misses {{ p.miss_count }}</p>
+  {% if p.error %}<div class="notice warn small">{{ p.error }}</div>{% endif %}
+</div>
+<div class="split">
+  <div class="card"><h3>Text as the agent reads it</h3><div style="max-height:520px; overflow:auto">{{ markdown(p.content_md or '(not read yet)') }}</div></div>
+  <div>
+    <div class="card"><h3>Versions</h3>
+      {% for v in p.versions %}<div class="row small">v{{ v.version }} {{ badge(v.change, 'info') }} {{ v.created_at|when }} +{{ v.lines_added }}/-{{ v.lines_removed }}
+        {% if not loop.last %}<button class="btn small" hx-get="/knowledge/pages/{{ p.id }}/diff?a={{ v.version - 1 }}&b={{ v.version }}" hx-target="#page-diff">What changed</button>{% endif %}</div>{% else %}<p class="faint small">none</p>{% endfor %}
+      <div id="page-diff" style="margin-top:8px"></div></div>
+    <div class="card"><h3>Health history</h3>
+      {% for e in p.health %}<div class="small">{{ e.at|when }} · {{ e.event }} · {{ e.from }} → {{ e.to }} ({{ e.count }}){% if e.detail %} · {{ e.detail }}{% endif %}</div>{% else %}<p class="faint small">no events</p>{% endfor %}</div>
+    <div class="card"><h3>Screenshots ({{ p.images|length }})</h3>
+      {% for i in p.images %}<div class="small" style="margin-bottom:8px"><strong>Screenshot {{ i.position }}</strong> {{ badge(i.state) }}{% if i.described_by %} <span class="faint">by {{ i.described_by }}</span>{% endif %}<br>{{ i.description or i.alt or '' }}</div>{% else %}<p class="faint small">none</p>{% endfor %}</div>
+  </div>
+</div>
+{% endblock %}

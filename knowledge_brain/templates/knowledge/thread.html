@@ -1,0 +1,25 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block knowledge %}
+<form method="post" action="/knowledge/emails/{{ thread.id }}/notes">{{ csrf_field() }}
+<div class="card">
+  <h2>{{ thread.subject }}</h2>
+  <p class="small muted">{{ thread.participants|join(', ') }} · personal data is masked</p>
+</div>
+{% for m in thread.messages %}
+<div class="card">
+  <div class="row"><strong>{{ m['from'] }}</strong><span class="small faint">{{ m.sent_at|when }}</span>{% for a in m.attachments %}<span class="badge info">{{ a.name }}</span>{% endfor %}</div>
+  <pre style="background:none; border:0; padding:6px 0">{{ m.body }}</pre>
+  {% for n in thread.notes if n.message_id == m.id %}<div class="notice info small">Note: {{ n.body }} {{ badge(n.status) }}</div>{% endfor %}
+  <input name="note_{{ m.id }}" type="text" placeholder="Note on this message (optional)">
+</div>
+{% endfor %}
+<div class="card">
+  <h3>Note on the whole thread</h3>
+  {% for n in thread.notes if not n.message_id %}<div class="notice info small">{{ n.body }} {{ badge(n.status) }}</div>{% endfor %}
+  <textarea name="note_thread" style="min-height:60px" placeholder="What should the agent learn from this thread?"></textarea>
+  <div class="form-actions"><button class="btn primary" type="submit">Submit notes</button>
+    <a class="btn" href="/knowledge/emails">Back to threads</a></div>
+</div>
+</form>
+{% endblock %}

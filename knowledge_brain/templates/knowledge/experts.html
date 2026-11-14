@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% from "macros.html" import csrf_field, tabs as tabs_macro, badge, empty with context %}
+{% block content %}
+<div class="page-head"><h1>Expert tasks</h1><span class="sub">questions the agent couldn't answer, or handed to a human; your answer becomes knowledge</span></div>
+{{ tabs_macro(tabs, tab) }}
+{% for t in tasks %}
+<div class="card">
+  <div class="row"><strong>{{ t.question }}</strong>{{ badge(t.reason|replace('_', ' '), 'warn') }}<span class="small faint">asked {{ t.asked_count }}x · {{ t.last_asked_at|ago }}</span>
+    {% if t.context.get('chat_id') %}<a class="small" href="/chat/{{ t.context.chat_id }}">open the chat</a>{% endif %}</div>
+  {% if t.status == 'open' %}
+  <form method="post" action="/experts/{{ t.id }}/answer" style="margin-top:8px">{{ csrf_field() }}
+    <textarea name="answer" style="min-height:70px" placeholder="The right answer. It is saved as knowledge and cited next time." required></textarea>
+    <div class="form-actions"><button class="btn primary small" type="submit">Answer</button>
+      <button class="btn small" type="submit" formaction="/experts/{{ t.id }}/dismiss" formnovalidate>Dismiss</button></div>
+  </form>
+  {% elif t.answer %}<p class="small" style="margin-top:8px"><strong>Answer:</strong> {{ t.answer }}</p>{% endif %}
+</div>
+{% else %}
+<div class="card">{{ empty("Nothing here.") }}</div>
+{% endfor %}
+{% endblock %}

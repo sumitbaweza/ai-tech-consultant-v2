@@ -1,0 +1,6 @@
+<div class="notice info">
+  <strong>Draft: {{ draft.name }}</strong> · {{ draft.when_to_use }}
+  <pre id="draft-md">{{ draft.markdown }}</pre>
+  <button class="btn small" type="button" onclick="document.getElementById('markdown').value = document.getElementById('draft-md').innerText">Use this draft</button>
+  <span class="small">Then edit, test it on the right, and save.</span>
+</div>

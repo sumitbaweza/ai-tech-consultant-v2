@@ -1,0 +1,20 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block knowledge %}
+<div class="card">
+  <p class="muted">Single pages, added one by one without a sitemap. They are read, kept fresh (weekly by default) and health-checked the same way as sitemap pages.</p>
+  {% if ctx.is_owner %}
+  <form class="row" method="post" action="/knowledge/page-urls">{{ csrf_field() }}
+    <input name="url" type="url" placeholder="https://example.com/pricing" required style="max-width:460px">
+    <button class="btn primary" type="submit">Add page</button>
+  </form>
+  {% endif %}
+</div>
+<div class="card">
+  {% if sources %}<table>
+    <thead><tr><th>Page</th><th>Level</th><th>Status</th><th>Last check</th></tr></thead>
+    <tbody>{% for s in sources %}<tr><td><a href="/knowledge/sources/{{ s.id }}?tab=pages">{{ s.label }}</a></td>
+      <td>{% for level, n in s.levels.items() %}{{ badge(level) }} {% endfor %}</td><td>{{ badge(s.status) }}</td><td class="small">{{ s.last_synced_at|ago }}</td></tr>{% endfor %}</tbody>
+  </table>{% else %}{{ empty("No page URLs yet.") }}{% endif %}
+</div>
+{% endblock %}

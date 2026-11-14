@@ -1,0 +1,19 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block knowledge %}
+<div class="card">
+  <p class="muted">Upload PDF, Word (DOCX), Markdown or text files: price lists, policies, internal guides. Their text is searched and cited like a web page.</p>
+  {% if ctx.is_owner %}
+  <form class="row" method="post" action="/knowledge/documents" enctype="multipart/form-data">{{ csrf_field() }}
+    <input name="file" type="file" accept=".pdf,.docx,.md,.markdown,.txt" required>
+    <button class="btn primary" type="submit">Upload</button>
+  </form>
+  {% endif %}
+</div>
+<div class="card">
+  {% if documents %}<table><thead><tr><th>File</th><th class="num">Size</th><th>Added</th><th>Level</th></tr></thead>
+  <tbody>{% for d in documents %}<tr><td>{% if d.page_id %}<a href="/knowledge/pages/{{ d.page_id }}">{{ d.filename }}</a>{% else %}{{ d.filename }}{% endif %}</td>
+    <td class="num">{{ (d.size_bytes / 1024)|round(1) }} KB</td><td class="small">{{ d.created_at|when }}</td><td>{{ badge(d.level or 'active') }}</td></tr>{% endfor %}</tbody></table>
+  {% else %}{{ empty("No documents yet.") }}{% endif %}
+</div>
+{% endblock %}

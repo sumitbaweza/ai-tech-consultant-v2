@@ -1,0 +1,22 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import stat, badge %}
+{% block knowledge %}
+<div class="card">
+  <div class="row"><h2 style="margin:0">Refresh run: {{ run.kind|replace('_', ' ') }}</h2>{{ badge(run.status) }}</div>
+  <div class="grid two" style="margin-top:12px">
+    {{ stat("First fetch", run.first_fetch_at|when) }}
+    {{ stat("Last fetch", run.last_fetch_at|when) }}
+  </div>
+  <p class="small" style="margin-top:10px">New {{ run.new_pages }} · changed {{ run.changed }} · unchanged {{ run.unchanged }} · missing {{ run.missing }} · moved {{ run.moved }} · recovered {{ run.recovered }} · failed {{ run.failed }}</p>
+</div>
+<div class="card">
+  <details>
+    <summary><strong>Show all URLs ({{ run.url_total|number }})</strong></summary>
+    <div class="table-wrap" style="margin-top:10px"><table>
+      <thead><tr><th>URL</th><th class="num">HTTP</th><th>Outcome</th><th>Fetched</th></tr></thead>
+      <tbody>{% for u in run.urls %}<tr><td class="small">{{ u.url }}</td><td class="num">{{ u.status or '-' }}</td><td>{{ badge(u.outcome, 'ok' if u.outcome in ['unchanged', 'new', 'changed', 'recovered'] else 'warn') }}</td><td class="small">{{ u.at|when }}</td></tr>{% endfor %}</tbody>
+    </table></div>
+  </details>
+  <p style="margin-top:12px"><strong>Total URLs fetched: {{ run.url_total|number }}</strong></p>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends "knowledge/layout.html" %}
+{% from "macros.html" import csrf_field, empty with context %}
+{% block actions %}{% if ctx.is_owner %}
+<form method="post" action="/knowledge/emails/sync">{{ csrf_field() }}<button class="btn" type="submit">Fetch threads from Gmail</button></form>
+<form method="post" action="/knowledge/emails/improve">{{ csrf_field() }}<button class="btn primary" type="submit">Improve skills from notes</button></form>
+{% endif %}{% endblock %}
+{% block knowledge %}
+<div class="card">
+  <p class="muted">Real threads from the connected Gmail (read-only). Write a note on a whole thread or on one message, for example "This reply was too long. For DNS questions, always give the 3 steps first." Then "Improve skills from notes": Claude Opus 5.5 proposes skill changes, and you approve them in Skills.</p>
+  {% if threads %}<div class="table-wrap"><table>
+    <thead><tr><th>Subject</th><th>People</th><th class="num">Messages</th><th class="num">Notes</th><th>Last message</th></tr></thead>
+    <tbody>{% for t in threads %}<tr><td><a href="/knowledge/emails/{{ t.id }}">{{ t.subject }}</a><div class="small faint">{{ (t.snippet or '')[:120] }}</div></td>
+      <td class="small">{{ t.participants|join(', ') }}</td><td class="num">{{ t.message_count }}</td><td class="num">{{ t.notes }}</td><td class="small">{{ t.last_message_at|when }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No threads yet. Connect Gmail in Settings > Keys and connections, then fetch.") }}{% endif %}
+</div>
+{% endblock %}
