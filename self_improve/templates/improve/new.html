@@ -1,0 +1,34 @@
+{% extends "improve/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block improve %}
+<form method="post" action="/improve/runs">
+  {{ csrf_field() }}<input type="hidden" name="run_id" value="{{ run_id }}">
+  <div class="card">
+    <h2>The failing cases Opus would get</h2>
+    <p class="small muted">Model under test: <strong>{{ packet.model_key or "-" }}</strong> · job: {{ packet.job|replace('_', ' ') }}. Untick a case to leave it out.</p>
+    {% if packet.failing %}
+    <table><thead><tr><th></th><th>Case</th><th>Question</th><th>Why it failed</th></tr></thead>
+      <tbody>{% for f in packet.failing %}<tr><td><input type="checkbox" name="result_ids" value="{{ f.result_id }}" checked aria-label="Send {{ f.case_key }}"></td>
+        <td class="small"><strong>{{ f.case_key }}</strong><br>{{ f.category|replace('_', ' ') }}</td><td class="small">{{ f.question }}<details><summary class="faint">answer and expected</summary><p>{{ f.answer[:600] }}</p><p class="faint">Expected: {{ f.expected }}</p></details></td>
+        <td class="small">{{ f.why or "-" }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("Nothing in this run is worth sending to Opus.") }}{% endif %}
+    {% if packet.excluded %}
+    <p class="small" style="margin-top:12px"><strong>Left for a person:</strong></p>
+    <ul class="small">{% for e in packet.excluded %}<li>{{ e.case_key }}: {{ e.reason }}</li>{% endfor %}</ul>
+    {% endif %}
+  </div>
+  {% if packet.failing %}
+  <div class="card">
+    <h2>Your comment: why did they fail?</h2>
+    <textarea name="comment" rows="5">{{ packet.comment }}</textarea>
+    <p class="help">Opus also gets the live prompts ({{ packet.prompts.keys()|join(", ") }}) and these files: {{ packet.related_files|join(", ") }}.</p>
+    <div class="grid two" style="margin-top:10px">
+      <div><label for="max_rounds">Most rounds</label><input id="max_rounds" name="max_rounds" type="number" min="1" max="10" value="{{ rounds }}"></div>
+      <div><label for="max_cost">Most $ for the whole run (Opus and the evals)</label><input id="max_cost" name="max_cost" type="number" min="0.5" max="50" step="0.5" value="{{ cost }}"></div>
+    </div>
+    <div class="form-actions"><button class="btn primary" type="submit">Send to Opus</button>
+      <span class="small muted">{{ "Fake agent: no model is called." if fake_models else "Spends from the Claude key in Settings, up to the limit." }}</span></div>
+  </div>
+  {% endif %}
+</form>
+{% endblock %}

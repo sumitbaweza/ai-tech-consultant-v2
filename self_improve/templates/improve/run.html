@@ -1,0 +1,50 @@
+{% extends "improve/layout.html" %}
+{% from "macros.html" import csrf_field, badge, stat, diff_view with context %}
+{% block improve %}
+<div id="improve-run" {% if busy %}hx-get="/improve/runs/{{ run.id }}" hx-trigger="every 5s" hx-select="#improve-run" hx-swap="outerHTML"{% endif %}>
+<div class="card">
+  <div class="row"><h2 style="margin:0">{{ run.title }}</h2>{{ badge(run.status) }}</div>
+  <p class="small muted" style="margin-top:6px">Started {{ run.created_at|when }} · finished {{ run.finished_at|when }}{% if run.branch %} · branch <code>{{ run.branch }}</code>{% endif %}{% if run.pr_url %} · <a href="{{ run.pr_url }}" target="_blank" rel="noopener">pull request</a>{% endif %}{% if run.report_path %} · report in <code>{{ run.report_path }}</code>{% endif %}</p>
+  {% if run.error %}<div class="notice bad small">{{ run.error }}</div>{% endif %}
+  {% if ctx.is_owner %}
+  <div class="row" style="margin-top:10px">
+    {% if run.status == 'fixed' %}
+    <form method="post" action="/improve/runs/{{ run.id }}/approve">{{ csrf_field() }}<button class="btn primary" type="submit">Approve and merge</button></form>
+    {% endif %}
+    {% if run.status in ('fixed', 'not_fixed') %}
+    <form method="post" action="/improve/runs/{{ run.id }}/reject">{{ csrf_field() }}<button class="btn" type="submit">Reject</button></form>
+    {% endif %}
+    {% if run.status == 'approved' %}
+    <form method="post" action="/improve/runs/{{ run.id }}/undo">{{ csrf_field() }}<button class="btn danger" type="submit">Undo</button></form>
+    {% endif %}
+  </div>
+  {% endif %}
+</div>
+<div class="grid four">
+  {{ stat("Given failing cases", (run.scores_before.get('failing')|percent if run.scores_before else "-") ~ " → " ~ (run.scores_after.get('failing')|percent if run.scores_after else "-"), (run.scores_before.get('failing_cases', 0) if run.scores_before else 0) ~ " cases") }}
+  {{ stat("Hidden check set", (run.scores_before.get('hidden')|percent if run.scores_before else "-") ~ " → " ~ (run.scores_after.get('hidden')|percent if run.scores_after and run.status != 'not_fixed' else "-"), "never shown to Opus") }}
+  {{ stat("Rounds", run.rounds_used ~ " of " ~ run.max_rounds) }}
+  {{ stat("Cost", run.cost_usd|money(2), "limit " ~ run.max_cost_usd|money(2)) }}
+</div>
+{% if run.violations %}<div class="notice warn" style="margin-top:14px"><strong>Thrown away:</strong> {{ run.violations|join("; ") }}</div>{% endif %}
+<div class="card" style="margin-top:16px">
+  <h2>Rounds</h2>
+  {% for r in rounds %}
+  <details {% if loop.last %}open{% endif %}><summary><strong>Round {{ r.n }}</strong> · tests {{ "passed" if r.tests_passed else "failed" }} · failing cases passing {{ r.scores.get('failing')|percent }} · {{ r.cost_usd|money(2) }} · {{ r.tool_calls|length }} tool calls</summary>
+    <div class="md small" style="margin:8px 0">{{ markdown(r.agent_summary or "(no summary)") }}</div>
+    {% if r.changed_files %}<p class="small">Changed: {% for f in r.changed_files %}<code>{{ f }}</code> {% endfor %}</p>{% endif %}
+    {% if r.tool_calls %}<details><summary class="small faint">Tool calls</summary><table><tbody>{% for c in r.tool_calls %}<tr><td class="small">{{ c.tool }}</td><td class="small"><code>{{ c.input }}</code></td><td class="small">{% if c.denied %}{{ badge("denied", "bad") }} {{ c.denied }}{% endif %}</td></tr>{% endfor %}</tbody></table></details>{% endif %}
+  </details>
+  {% else %}<p class="muted">{{ "Waiting for the improve worker." if run.status == 'queued' else "No rounds." }}</p>{% endfor %}
+</div>
+{% if run.packet.get('diff') %}
+<div class="card"><h2>The change</h2>{{ diff_view(run.packet.diff) }}</div>
+{% endif %}
+{% for key, body in (run.packet.get('prompt_changes') or {}).items() %}
+<div class="card"><h2>New text for the prompt {{ key }}</h2><pre class="small" style="white-space:pre-wrap">{{ body }}</pre></div>
+{% endfor %}
+{% if run.report_md %}
+<div class="card"><h2>Report</h2><div class="md">{{ markdown(run.report_md) }}</div></div>
+{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,32 @@
+{% extends "improve/layout.html" %}
+{% from "macros.html" import badge, empty %}
+{% block improve %}
+<div class="card">
+  <h2>How it works</h2>
+  <ol class="small">
+    <li>Pick an Eval Lab run with failures. The app packs the failing answers, the reasons, the prompts and the related code. Safety cases (tricks, hand-offs) stay with a person.</li>
+    <li>Opus edits an export of the code, outside the repo and without the hidden check set. Edits to the test set, the tests, the judge and its prompts are thrown away and reported.</li>
+    <li>After each round the app itself runs the unit tests and the failing cases. When they all pass, it runs the other cases and the hidden check set: nothing may drop.</li>
+    <li>It stops at the round limit or the $ limit and writes what it tried. A fixed run becomes a branch{% if github %} and a pull request{% endif %}, with a report.</li>
+  </ol>
+</div>
+<div class="card">
+  <h2>Start from an eval run</h2>
+  {% if sources and ctx.is_owner %}
+  <form method="get" action="/improve/new" class="row">
+    <select name="run_id" aria-label="Eval run">{% for r in sources %}<option value="{{ r.id }}">{{ r.name }} · {{ r.finished_at|when }}</option>{% endfor %}</select>
+    <button class="btn" type="submit">See what would be sent</button>
+  </form>
+  {% elif not sources %}{{ empty("No finished eval run yet. Run a benchmark in the Eval Lab first.") }}{% endif %}
+</div>
+<div class="card" id="improve-runs" {% if busy %}hx-get="/improve" hx-trigger="every 5s" hx-select="#improve-runs" hx-swap="outerHTML"{% endif %}>
+  <h2>Runs</h2>
+  {% if runs %}
+  <div class="table-wrap"><table>
+    <thead><tr><th>Run</th><th>Status</th><th class="num">Rounds</th><th class="num">Cost</th><th>Started</th></tr></thead>
+    <tbody>{% for r in runs %}<tr><td><a href="/improve/runs/{{ r.id }}">{{ r.title }}</a></td><td>{{ badge(r.status) }}</td>
+      <td class="num">{{ r.rounds_used }} / {{ r.max_rounds }}</td><td class="num">{{ r.cost_usd|money(2) }} / {{ r.max_cost_usd|money(2) }}</td><td class="small">{{ r.created_at|ago }}</td></tr>{% endfor %}</tbody>
+  </table></div>
+  {% else %}{{ empty("No Self-Improve runs yet.") }}{% endif %}
+</div>
+{% endblock %}

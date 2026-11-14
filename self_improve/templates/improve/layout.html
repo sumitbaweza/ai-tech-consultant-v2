@@ -1,0 +1,8 @@
+{% extends "base.html" %}
+{% from "macros.html" import tabs as tabs_macro %}
+{% block title %}Self-Improve{% endblock %}
+{% block content %}
+<div class="page-head"><h1>Self-Improve</h1><span class="sub">Claude Opus 5.5 fixes failing cases on its own branch; a person approves or undoes with one click</span></div>
+{{ tabs_macro(tabs, tab) }}
+{% block improve %}{% endblock %}
+{% endblock %}

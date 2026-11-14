@@ -1,0 +1,21 @@
+{% extends "improve/layout.html" %}
+{% from "macros.html" import csrf_field, badge, empty with context %}
+{% block improve %}
+<div class="split">
+  <div class="card">
+    <div class="row"><h2 style="margin:0">Weekly emails</h2>
+      {% if ctx.is_owner %}<form method="post" action="/improve/weekly/now" style="margin-left:auto">{{ csrf_field() }}<button class="btn small" type="submit">Make this week's now</button></form>{% endif %}</div>
+    <p class="small muted">Every Monday at 07:00 UTC the owner gets one email: what got better, what failed, and the cost. It goes through the owner's Gmail (Settings, Keys); without Gmail it is kept here.</p>
+    {% if reports %}
+    <table><tbody>{% for r in reports %}<tr><td><a href="/improve/weekly?report_id={{ r.id }}">{{ r.week_start.strftime('%d %b %Y') }}</a></td><td>{{ badge(r.send_status) }}</td><td class="small faint">{{ r.sent_to or "" }}</td></tr>{% endfor %}</tbody></table>
+    {% else %}{{ empty("No weekly email yet.") }}{% endif %}
+  </div>
+  <div class="card">
+    {% if report %}
+    <p class="small faint">Subject</p><p><strong>{{ report.subject }}</strong></p>
+    {% if report.error %}<div class="notice bad small">{{ report.error }}</div>{% endif %}
+    <div class="md">{{ markdown(report.body_md) }}</div>
+    {% else %}{{ empty("Pick a week.") }}{% endif %}
+  </div>
+</div>
+{% endblock %}
