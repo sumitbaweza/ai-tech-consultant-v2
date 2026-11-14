@@ -1,0 +1,29 @@
+{% from "macros.html" import badge %}
+<h3>Trace</h3>
+{% if trace %}
+{% set a = trace.answer %}
+<dl>
+  <dt>Result</dt><dd>{{ badge('answered' if a.answered else ('sent to a human' if a.needs_human else 'not answered'), 'ok' if a.answered else 'warn') }}</dd>
+  <dt>Model</dt><dd>{{ a.model_key or 'none (no model needed)' }}</dd>
+  <dt>Cost</dt><dd>{{ a.cost_usd|money(5) }}</dd>
+  <dt>Time</dt><dd>{{ (a.latency_ms / 1000)|round(1) }} s</dd>
+  <dt>Role</dt><dd>{{ a.summary.get('role', '-') }}</dd>
+  <dt>Knowledge</dt><dd>{{ a.knowledge_types|join(', ')|replace('_', ' ') or '-' }} ({{ a.citations|length }} cited)</dd>
+  <dt>Skill</dt><dd>{{ a.summary.get('skill') or 'none' }}</dd>
+  <dt>Lessons</dt><dd>{{ a.summary.get('lessons', [])|join(', ') or 'none' }}</dd>
+  <dt>Search</dt><dd>top score {{ a.top_score if a.top_score is not none else '-' }}</dd>
+  {% if a.handoff_reason %}<dt>Hand-off</dt><dd>{{ a.handoff_reason }}</dd>{% endif %}
+  {% if a.safety.get('injection') %}<dt>Shield</dt><dd>{{ badge('trick spotted', 'bad') }} {{ a.safety.get('injection_hits', [])|join('; ') }}</dd>{% endif %}
+</dl>
+<h3 style="margin-top:12px">Steps</h3>
+<div class="steps">
+  {% for s in a.summary.get('steps', []) %}<div><span>{{ s.name|replace('_', ' ') }}</span><span>{{ s.ms }} ms</span></div>{% endfor %}
+</div>
+<h3 style="margin-top:12px">Model calls</h3>
+<div class="steps">
+  {% for c in trace.calls %}<div><span>{{ c.step }} · {{ c.model_key }}</span><span>{{ c.cost_usd|money(5) }}</span></div>{% else %}<div class="faint">none</div>{% endfor %}
+</div>
+{% if a.trace_id %}<p class="small" style="margin-top:10px"><a href="/logs/traces/{{ a.trace_id }}">Full trace</a></p>{% endif %}
+{% else %}
+<p class="muted small">Pick an answer's "Trace" to see which knowledge, skill and lessons it used, the model, and its cost.</p>
+{% endif %}

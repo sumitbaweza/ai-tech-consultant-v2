@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% from "macros.html" import csrf_field, badge with context %}
+{% block content %}
+{% set allowed, gate_note = gate %}
+{% if gate_note %}<div class="notice warn">{{ gate_note }}</div>{% endif %}
+<div class="chat-layout">
+  <aside class="chat-list">
+    <details {% if not chat %}open{% endif %} style="margin-bottom:10px">
+      <summary class="btn primary" style="width:100%; justify-content:center">New chat</summary>
+      <form method="post" action="/chat" style="margin-top:10px">{{ csrf_field() }}
+        <label class="inline"><input type="radio" name="mode" value="ask" checked> Ask something</label><br>
+        <label class="inline"><input type="radio" name="mode" value="teach"> Teach me</label>
+        <label for="new-role">Role</label>
+        <select id="new-role" name="role_id">{% for role, version in roles %}<option value="{{ role.id }}" {% if role.key == 'support-executive' %}selected{% endif %}>{{ role.name }}</option>{% endfor %}</select>
+        <div class="form-actions"><button class="btn small primary" type="submit">Start</button></div>
+      </form>
+    </details>
+    {% for c in chats %}
+      <a href="/chat/{{ c.id }}" class="{{ 'active' if chat and c.id == chat.id else '' }}">{{ c.title }}
+        <div class="meta">{{ 'Teach' if c.mode == 'teach' else 'Ask' }} · {{ c.updated_at|ago }}</div></a>
+    {% endfor %}
+  </aside>
+
+  <section class="conversation">
+    {% if chat %}
+    <div class="head">
+      {{ badge('Teach me' if chat.mode == 'teach' else 'Ask something', 'info') }}
+      <form method="post" action="/chat/{{ chat.id }}/role" class="row">{{ csrf_field() }}
+        <label class="inline small muted">Role
+        <select name="role_id" data-autosubmit>{% for role, version in roles %}<option value="{{ role.id }}" {% if role.id == chat.role_id %}selected{% endif %}>{{ role.name }}</option>{% endfor %}</select></label>
+      </form>
+      <span class="small faint" style="margin-left:auto">Paste a customer's whole email: the agent finds the real question.</span>
+    </div>
+    <div class="messages" id="messages">
+      {% if not messages %}
+      <div class="empty">{% if chat.mode == 'teach' %}Teach the agent: share a rule, correct an old answer, or show how you'd reply. It asks back until it's sure, then drafts a lesson.{% else %}Ask a question or paste a customer's message. To correct an answer, reply "This is wrong, the right answer is ...".{% endif %}</div>
+      {% endif %}
+      {% for m in messages %}{% include "ask_teach_chat/_message.html" %}{% endfor %}
+    </div>
+    <form class="composer" hx-post="/chat/{{ chat.id }}/messages" hx-target="#messages" hx-swap="beforeend"
+          hx-on::after-request="if(event.detail.successful) this.reset()">
+      <textarea name="text" placeholder="{{ 'Teach me something...' if chat.mode == 'teach' else 'Type or paste a customer message (Ctrl+Enter sends)' }}" required {% if not allowed %}disabled{% endif %}></textarea>
+      <button class="btn primary" type="submit" {% if not allowed %}disabled{% endif %}>Send<span class="spinner"> ...</span></button>
+    </form>
+    {% else %}
+    <div class="empty" style="margin:auto">Start a chat: "Ask something" to answer customers, "Teach me" to teach the agent.</div>
+    {% endif %}
+  </section>
+
+  <aside class="trace" id="trace">{% include "ask_teach_chat/_trace.html" %}</aside>
+</div>
+{% endblock %}

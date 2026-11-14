@@ -1,0 +1,12 @@
+{% if result.error %}
+<div class="notice warn">{{ result.error }}</div>
+{% else %}
+{% set o = result.outcome %}
+<div class="msg user" style="max-width:100%">{{ question }}</div>
+<div class="msg agent {{ o.kind }}" style="max-width:100%; margin-top:8px">
+  {% if o.kind == 'handoff' %}<strong>Send to a human</strong>{% endif %}
+  {{ markdown(o.text) }}
+  {% if o.citations %}<div class="sources">{% for c in o.citations %}<a href="/sources/{{ c.chunk_id }}" target="_blank">[{{ c.n }}] {{ c.title[:40] }}</a>{% endfor %}</div>{% endif %}
+  <p class="small faint" style="margin-top:6px">{{ o.model_key or 'no model' }} · {{ o.cost_usd|money(5) }} · {{ (o.latency_ms / 1000)|round(1) }} s{% if o.skill_name %} · skill: {{ o.skill_name }}{% endif %} · <a href="/logs/traces/{{ o.trace_id }}" target="_blank">trace</a></p>
+</div>
+{% endif %}

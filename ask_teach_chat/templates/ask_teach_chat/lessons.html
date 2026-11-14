@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% from "macros.html" import csrf_field, tabs as tabs_macro, badge, empty with context %}
+{% block content %}
+<div class="page-head"><h1>Lessons</h1><span class="sub">what the agent learned from corrections; nothing is used before a human approves it</span>
+  <div class="actions"><a class="btn small" href="/lessons/download">Download the lesson files (.zip)</a></div></div>
+{{ tabs_macro(tabs, tab) }}
+{% for item in items %}
+{% set l, v = item.lesson, item.version %}
+<div class="card">
+  <div class="row"><strong>{{ l.title }}</strong>{{ badge(l.status) }}<code class="small">lessons/{{ l.topic }}.md</code>
+    <span class="small faint">taught by {{ item.who }} · {{ l.created_at|when }} · confidence {{ (l.confidence * 100)|round|int }}% · v{{ v.version }}</span></div>
+  {% if l.skill_proposal_id %}<div class="notice info small">This fits a whole kind of work, so a skill change was proposed too: <a href="/knowledge/skills">review it in Skills</a>.</div>{% endif %}
+  {% if l.conflicts_with %}<div class="notice warn small">May disagree with {{ l.conflicts_with|length }} approved lesson(s). If both stay, the newer one wins.</div>{% endif %}
+  <div class="split" style="margin-top:8px">
+    <div>{{ markdown(v.markdown) }}</div>
+    <div class="small">
+      <p><strong>Rule:</strong> {{ v.rule }}</p>
+      {% if v.example.get('question') %}<p><strong>Example question:</strong> {{ v.example.question }}</p>{% endif %}
+      {% if v.example.get('wrong_answer') %}<p><strong>Wrong answer was:</strong> {{ v.example.wrong_answer[:300] }}</p>{% endif %}
+      {% if l.chat_id %}<p><a href="/chat/{{ l.chat_id }}">The chat it came from</a></p>{% endif %}
+    </div>
+  </div>
+  <details style="margin-top:8px"><summary class="small">Edit</summary>
+    <form method="post" action="/lessons/{{ l.id }}/edit">{{ csrf_field() }}<textarea name="markdown" class="code" style="min-height:180px">{{ v.markdown }}</textarea>
+      <button class="btn small" type="submit">Save as a new version</button></form></details>
+  <div class="row" style="margin-top:10px">
+    {% if l.status != 'approved' %}<form method="post" action="/lessons/{{ l.id }}/approve">{{ csrf_field() }}{% if l.conflicts_with %}<input type="hidden" name="confirm" value="true">{% endif %}<button class="btn small primary" type="submit">Approve</button></form>{% endif %}
+    {% if l.status == 'approved' %}<form method="post" action="/lessons/{{ l.id }}/off">{{ csrf_field() }}<button class="btn small" type="submit">Switch off</button></form>{% endif %}
+    <form method="post" action="/lessons/{{ l.id }}/test">{{ csrf_field() }}<button class="btn small" type="submit">Test before and after</button></form>
+    <form method="post" action="/lessons/{{ l.id }}/delete">{{ csrf_field() }}<button class="btn small danger" type="submit">Delete</button></form>
+  </div>
+</div>
+{% else %}
+<div class="card">{{ empty("No lessons here. Correct an answer in the chat, or start a \"Teach me\" chat.") }}</div>
+{% endfor %}
+{% endblock %}

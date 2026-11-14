@@ -1,0 +1,30 @@
+{% set a = answers.get(m.id) %}
+{% if m.sender == 'user' %}
+<div class="msg user">{{ m.body }}</div>
+{% else %}
+<div class="msg agent {{ m.kind }}" id="msg-{{ m.id }}">
+  {% if a and a.question and m.kind in ['answer', 'dont_know'] %}<div class="found">Question found: "{{ a.question[:200] }}"</div>{% endif %}
+  {% if m.kind == 'handoff' %}<strong>Send to a human</strong>{% endif %}
+  {% if m.kind == 'lesson_draft' %}<strong>Lesson drafted</strong> <a class="small" href="/lessons?status=pending">review in Lessons</a>{% endif %}
+  <div id="answer-{{ m.id }}">{{ markdown(m.body, cite_url='/chat/cite/' ~ m.id ~ '/') }}</div>
+  {% if a and a.citations %}
+  <div class="sources">{% for c in a.citations %}<a href="/sources/{{ c.chunk_id }}" title="{{ c.quote }}">[{{ c.n }}] {{ c.title[:50] }} · {{ c.knowledge_type|replace('_', ' ') }}</a>{% endfor %}</div>
+  {% endif %}
+  {% if a %}
+  <div class="tools">
+    {% if a.knowledge_types %}<span class="small muted">Used: {{ a.knowledge_types|join(', ')|replace('_', ' ') }}</span>{% endif %}
+    {% if m.kind == 'answer' %}<button class="btn small" type="button" data-copy="#answer-{{ m.id }}">Copy reply</button>{% endif %}
+    <button class="btn small" type="button" hx-get="/chat/answers/{{ m.id }}/trace" hx-target="#trace">Trace</button>
+    <form hx-post="/chat/answers/{{ m.id }}/feedback" hx-target="#fb-{{ m.id }}" style="display:inline">
+      <input type="hidden" name="verdict" value="right"><button class="btn small" type="submit" title="This was right">&#128077;</button></form>
+    <details style="display:inline-block"><summary class="btn small" title="This was wrong">&#128078; Comment</summary>
+      <form hx-post="/chat/answers/{{ m.id }}/feedback" hx-target="#fb-{{ m.id }}" style="margin-top:6px; min-width:320px">
+        <input type="hidden" name="verdict" value="wrong">
+        <input name="why" type="text" placeholder="Why was it wrong?">
+        <textarea name="correct_answer" style="min-height:60px; margin-top:6px" placeholder="The right answer (optional, makes a lesson)"></textarea>
+        <button class="btn small primary" type="submit" style="margin-top:6px">Send</button></form></details>
+    <span id="fb-{{ m.id }}"></span>
+  </div>
+  {% endif %}
+</div>
+{% endif %}
